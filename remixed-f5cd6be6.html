@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interior Zone — Nano Banana Prompt Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b0b;--bg2:#141212;--bg3:#1c1a1a;--sf:#242222;--sf2:#2e2b2b;
+  --br:rgba(255,255,255,0.07);--br2:rgba(255,255,255,0.14);--br3:rgba(255,255,255,0.22);
+  --tx:#f0f0f0;--tx2:#a0a0a0;--tx3:#4a4a4a;
+  --ac:#0077B6;--ac2:#0096e0;--yw:#f2d709;--rd:#e11d3c;--gr:#22c55e;
+  --r:10px;--r2:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6;direction:ltr;}
+body.en{direction:ltr;font-family:'Inter','Cairo',sans-serif;}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--br);padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;height:58px;gap:12px;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.iz-badge{display:flex;flex-direction:column;align-items:flex-start;}
+.iz-name{font-size:11px;font-weight:700;color:var(--yw);letter-spacing:2px;text-transform:uppercase;line-height:1;}
+.iz-sub{font-size:10px;color:var(--tx3);letter-spacing:1px;margin-top:2px;}
+.divider-v{width:1px;height:28px;background:var(--br2);}
+.tool-name{font-size:13px;font-weight:600;color:var(--tx);letter-spacing:.3px;}
+.tool-name span{color:var(--yw);}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.mbtn{padding:5px 12px;border:1px solid var(--br2);border-radius:20px;background:transparent;color:var(--tx2);font-size:11px;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit;}
+.mbtn.active{background:var(--yw);border-color:var(--yw);color:#000;font-weight:700;}
+.mbtn:hover:not(.active){border-color:var(--ac);color:var(--tx);}
+.lang-btn{padding:5px 13px;border:1px solid var(--br2);border-radius:20px;background:var(--sf);color:var(--tx);font-size:11px;cursor:pointer;transition:all .2s;font-weight:600;font-family:inherit;letter-spacing:.3px;}
+.lang-btn:hover{border-color:var(--yw);color:var(--yw);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:460px 1fr;min-height:calc(100vh - 58px);}
+.sidebar{background:var(--bg2);border-left:1px solid var(--br);overflow-y:auto;padding:22px 22px 40px;}
+body.en .sidebar{border-left:none;border-right:1px solid var(--br);}
+.main-col{padding:26px 32px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
+
+/* SECTION LABEL */
+.slbl{font-size:9px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:2px;margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.slbl::before{content:'';flex:1;height:1px;background:var(--br);}
+body.en .slbl{flex-direction:row-reverse;}
+body.en .slbl::before{display:none;}
+body.en .slbl::after{content:'';flex:1;height:1px;background:var(--br);}
+
+/* INTENT PILLS */
+.intent-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.ipill{padding:5px 13px;border:1px solid var(--br2);border-radius:20px;background:var(--bg3);color:var(--tx2);font-size:11px;cursor:pointer;transition:all .18s;font-family:inherit;font-weight:500;}
+.ipill.active{background:var(--yw);border-color:var(--yw);color:#000;font-weight:700;}
+.ipill:hover:not(.active){border-color:var(--ac2);color:var(--tx);}
+
+/* CATEGORY PILLS */
+.cat-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.cpill{padding:5px 13px;border:1px solid var(--br);border-radius:20px;background:var(--bg3);color:var(--tx2);font-size:11px;cursor:pointer;transition:all .18s;font-family:inherit;font-weight:500;}
+.cpill.active{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700;}
+.cpill:hover:not(.active){border-color:var(--br2);color:var(--tx);}
+
+/* PANELS */
+.cpanel{display:none;}
+.cpanel.active{display:block;}
+
+/* FIELDS */
+.fg{margin-bottom:14px;}
+.fl{font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:6px;display:block;letter-spacing:.3px;}
+.req{color:var(--rd);}
+select,input[type=text],textarea{width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13px;padding:9px 11px;outline:none;transition:border-color .2s;appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 9px center;padding-left:26px;cursor:pointer;}
+body.en select{background-position:right 9px center;padding-left:10px;padding-right:26px;}
+select:focus,input:focus,textarea:focus{border-color:var(--ac);}
+textarea{resize:vertical;min-height:54px;line-height:1.5;}
+select option{background:#1c1a1a;color:var(--tx);}
+
+/* IMAGE UPLOAD ZONE */
+.img-upload-zone{border:1.5px dashed var(--br2);border-radius:var(--r2);padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);position:relative;margin-bottom:12px;}
+.img-upload-zone:hover,.img-upload-zone.drag{border-color:var(--ac);background:rgba(0,119,182,.05);}
+.img-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:22px;margin-bottom:4px;opacity:.5;}
+.upload-lbl{font-size:11px;color:var(--tx2);line-height:1.5;}
+.upload-lbl strong{color:var(--ac2);}
+.upload-hint{font-size:9px;color:var(--tx3);margin-top:3px;}
+
+/* UPLOADED IMAGES GRID */
+.imgs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.img-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--sf);}
+.img-thumb img{width:100%;height:100%;object-fit:cover;}
+.img-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.7);border:none;border-radius:50%;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.img-role-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-size:8px;color:var(--tx2);text-align:center;padding:2px 4px;}
+.img-count-badge{font-size:10px;color:var(--tx3);text-align:center;margin-bottom:8px;}
+
+/* TAGS */
+.tgrid{display:flex;flex-wrap:wrap;gap:4px;}
+.tag{padding:5px 11px;border-radius:20px;border:1px solid var(--br);background:var(--bg3);color:var(--tx2);font-size:11.5px;cursor:pointer;transition:all .15s;font-family:inherit;font-weight:500;user-select:none;}
+.tag.sel{background:var(--ac);border-color:var(--ac);color:#fff;}
+.tag:hover:not(.sel){border-color:var(--br2);color:var(--tx);}
+
+/* SEP */
+.sep{height:1px;background:var(--br);margin:12px 0;}
+
+/* ADV */
+.adv-btn{font-size:10px;color:var(--ac);cursor:pointer;border:none;background:none;font-family:inherit;padding:0;margin-bottom:10px;text-decoration:underline;text-decoration-style:dotted;display:block;}
+.adv-sec{display:none;}
+.adv-sec.open{display:block;}
+
+/* GEN BUTTON */
+.reset-btn{width:100%;padding:9px;border-radius:var(--r);background:transparent;color:var(--tx2);border:1px solid var(--br2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:18px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.reset-btn:hover{border-color:var(--rd);color:var(--rd);background:rgba(225,29,60,0.05);}
+.reset-btn:active{transform:scale(.99);}
+.genbtn{width:100%;padding:12px;border-radius:var(--r);background:var(--ac);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:14px;letter-spacing:.3px;}
+.genbtn:hover{background:var(--ac2);}
+.genbtn:active{transform:scale(.99);}
+
+/* OUTPUT */
+.ocard{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r2);overflow:hidden;}
+.ohdr{padding:11px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.ohdr-l{display:flex;align-items:center;gap:8px;}
+.itag{font-size:9px;font-weight:700;color:var(--yw);background:rgba(242,215,9,.1);border:1px solid rgba(242,215,9,.2);padding:2px 8px;border-radius:4px;letter-spacing:1px;}
+.ccount{font-size:10px;color:var(--tx3);}
+.ccount.ok{color:var(--gr);}
+.ccount.warn{color:#f59e0b;}
+.ccount.over{color:var(--rd);}
+.obody{padding:16px;min-height:120px;position:relative;}
+.oprmt{font-size:12.5px;line-height:1.9;color:var(--tx);white-space:pre-wrap;word-break:break-word;display:none;direction:ltr;text-align:left;font-family:'Inter',sans-serif;}
+.ophld{font-size:12px;color:var(--tx3);font-style:italic;}
+.ofoot{padding:10px 16px;border-top:1px solid var(--br);display:none;gap:6px;align-items:center;flex-wrap:wrap;}
+.cbar{height:3px;background:var(--sf);}
+.cbar-f{height:100%;background:var(--ac);transition:width .3s,background .3s;}
+
+/* BTNS */
+.btn{padding:6px 14px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;border:1px solid transparent;display:inline-flex;align-items:center;gap:5px;}
+.btn-cp{background:var(--sf);color:var(--tx);border-color:var(--br2);}
+.btn-cp:hover{border-color:var(--ac);}
+.btn-cp.copied{background:rgba(34,197,94,.1);border-color:var(--gr);color:var(--gr);}
+.btn-gh{background:transparent;color:var(--tx2);border-color:var(--br);}
+.btn-gh:hover{border-color:var(--br2);color:var(--tx);}
+
+
+
+
+/* LOADING */
+.ldots{display:none;gap:4px;align-items:center;justify-content:center;padding:28px;}
+.ldots.on{display:flex;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:bns 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes bns{0%,80%,100%{transform:scale(.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+
+/* REF IMAGES SECTION HEADER */
+.ref-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.clear-imgs-btn{font-size:10px;color:var(--rd);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;}
+.clear-imgs-btn:hover{text-decoration:underline;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--sf2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="hdr">
+  <div class="logo-area">
+    <div class="iz-badge">
+      <div class="iz-name">Interior Zone</div>
+      <div class="iz-sub" id="hdr-sub">AI Tools Suite</div>
+    </div>
+    <div class="divider-v"></div>
+    <div class="tool-name" id="tool-lbl">Nano Banana <span>Prompt Builder</span></div>
+  </div>
+  <div class="hdr-right">
+    <div style="display:flex;gap:4px;" id="model-btns">
+      <button class="mbtn" data-m="gemini-2.5-flash-image" onclick="selModel(this)">Nano Banana</button>
+      <button class="mbtn" data-m="gemini-3.1-flash-image-preview" onclick="selModel(this)">NB 2</button>
+      <button class="mbtn active" data-m="gemini-3-pro-image-preview" onclick="selModel(this)">NB Pro ✦</button>
+    </div>
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+  </div>
+</div>
+
+<!-- ═══════════════ LAYOUT ═══════════════ -->
+<div class="layout">
+
+<!-- ════ SIDEBAR ════ -->
+<div class="sidebar" id="sidebar">
+
+  <!-- RESET -->
+  <button class="reset-btn" id="resetBtn" onclick="resetAll()">↺ Reset all</button>
+
+  <!-- INTENT -->
+  <div class="slbl" id="lbl-intent">Intent</div>
+  <div class="intent-row" id="intentRow">
+    <button class="ipill active" data-intent="GENERATE" onclick="selIntent(this)">Generate</button>
+    <button class="ipill" data-intent="EDIT" onclick="selIntent(this)">Edit</button>
+    <button class="ipill" data-intent="BLEND" onclick="selIntent(this)">Blend</button>
+    <button class="ipill" data-intent="TEXT" onclick="selIntent(this)">Text in Image</button>
+    <button class="ipill" data-intent="2D3D" onclick="selIntent(this)">2D → 3D</button>
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="slbl" id="lbl-cat">Category</div>
+  <div class="cat-row" id="catRow">
+    <button class="cpill active" data-cat="int" onclick="selCat(this)">Interior Design</button>
+    <button class="cpill" data-cat="arch" onclick="selCat(this)">Architecture</button>
+    <button class="cpill" data-cat="urban" onclick="selCat(this)">Urban Design</button>
+    <button class="cpill" data-cat="prod" onclick="selCat(this)">Product Design</button>
+  </div>
+
+  <!-- ══ REFERENCE IMAGES ══ -->
+  <div class="slbl" id="lbl-ref">Reference Images</div>
+  <div class="ref-hdr">
+    <span class="fl" id="lbl-ref-sub" style="margin:0;font-size:10px;">Upload up to 15 images — helps Claude describe better</span>
+    <button class="clear-imgs-btn" onclick="clearAllImgs()" id="clear-imgs-lbl" style="display:none;">Clear all</button>
+  </div>
+  <div class="img-upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+    <div class="upload-icon">🖼</div>
+    <div class="upload-lbl" id="upload-lbl-text"><strong>Click to upload</strong> or drag & drop</div>
+    <div class="upload-hint" id="upload-hint-text">JPG · PNG · WEBP — or paste (Ctrl+V) — max 15</div>
+  </div>
+  <div class="imgs-grid" id="imgsGrid" style="grid-template-columns:repeat(4,1fr);"></div>
+  <div class="img-count-badge" id="imgCountBadge"></div>
+
+  <!-- ══ USER DESCRIPTION BOX (shown for Edit / Blend / 2D3D) ══ -->
+  <div id="user-desc-wrap" style="display:none;">
+    <div class="fg" style="margin-top:6px;">
+      <label class="fl" id="lbl-user-desc" style="color:var(--yw);">What do you want to do? <span style="color:var(--tx3);font-weight:400;">(optional — sidebar fields are optional too)</span></label>
+      <textarea id="user-desc" style="min-height:72px;border-color:rgba(242,215,9,0.25);" placeholder="e.g. Change sofa color to emerald green, keep everything else the same. Add natural daylight feel..."></textarea>
+    </div>
+  </div>
+
+  <!-- ══ TEXT-IN-IMAGE BOX (shown for TEXT intent) ══ -->
+  <div id="text-img-wrap" style="display:none;">
+    <div class="fg" style="margin-top:6px;">
+      <label class="fl" id="lbl-text-img" style="color:var(--yw);">Exact text to render in the image <span style="color:var(--tx3);font-weight:400;">(type the words exactly)</span></label>
+      <input type="text" id="text-img-input" style="border-color:rgba(242,215,9,0.25);" placeholder='e.g. Interior Zone Academy · مشروع في 6 ساعات'>
+    </div>
+  </div>
+
+  <!-- ══════ INTERIOR DESIGN PANEL ══════ -->
+  <div class="cpanel active" id="panel-int">
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-space">Space Type <span class="req">*</span></label>
+      <select id="int-space">
+        <option value="">— Select —</option>
+        <optgroup label="Residential">
+          <option value="a luxury master bedroom suite">Master Bedroom Suite</option>
+          <option value="a spacious modern living room">Living Room</option>
+          <option value="an open-plan kitchen and dining area">Kitchen & Dining (Open Plan)</option>
+          <option value="a luxury en-suite bathroom with spa elements">Luxury Bathroom / En-Suite</option>
+          <option value="a dedicated home office workspace">Home Office</option>
+          <option value="a children's bedroom">Children's Bedroom</option>
+          <option value="a luxury walk-in closet and dressing room">Walk-in Closet / Dressing Room</option>
+          <option value="a private home library and reading room">Home Library & Reading Room</option>
+          <option value="a grand entrance foyer and reception hall">Entrance Foyer / Reception Hall</option>
+          <option value="a home cinema and media room">Home Cinema / Media Room</option>
+          <option value="a rooftop terrace and outdoor lounge">Rooftop Terrace / Outdoor Lounge</option>
+          <option value="a private gym and wellness room">Home Gym & Wellness Room</option>
+          <option value="a compact studio apartment">Studio Apartment</option>
+          <option value="a penthouse sky lounge with panoramic views">Penthouse Sky Lounge</option>
+          <option value="a guest bedroom">Guest Bedroom</option>
+          <option value="a nursery and baby room">Nursery / Baby Room</option>
+          <option value="a teenage bedroom">Teen Bedroom</option>
+          <option value="a dining room">Formal Dining Room</option>
+          <option value="a wine cellar and tasting room">Wine Cellar & Tasting Room</option>
+          <option value="a covered outdoor terrace and pergola">Outdoor Terrace & Pergola</option>
+        </optgroup>
+        <optgroup label="Hospitality">
+          <option value="a grand luxury hotel lobby">Hotel Lobby (Grand)</option>
+          <option value="a boutique hotel suite">Boutique Hotel Suite</option>
+          <option value="a fine dining restaurant interior">Fine Dining Restaurant</option>
+          <option value="a casual café and coffee shop interior">Café & Coffee Shop</option>
+          <option value="a rooftop bar and lounge">Rooftop Bar & Lounge</option>
+          <option value="a luxury spa and wellness center interior">Spa & Wellness Center</option>
+          <option value="a private members club and lounge">Private Members Club</option>
+          <option value="a hotel corridor and hallway">Hotel Corridor</option>
+          <option value="a resort pool area and beach club">Resort Pool & Beach Club</option>
+        </optgroup>
+        <optgroup label="Commercial & Office">
+          <option value="a modern corporate office open workspace">Corporate Office (Open Plan)</option>
+          <option value="a CEO executive office">Executive / CEO Office</option>
+          <option value="a boardroom and conference room">Boardroom & Conference Room</option>
+          <option value="a co-working space">Co-Working Space</option>
+          <option value="a creative studio workspace">Creative Studio</option>
+          <option value="a high-end retail showroom">Retail Showroom</option>
+          <option value="a luxury fashion boutique">Fashion Boutique</option>
+          <option value="a medical clinic reception and waiting area">Medical Clinic Reception</option>
+          <option value="a dental clinic interior">Dental Clinic</option>
+          <option value="a beauty salon and nail studio">Beauty Salon & Nail Studio</option>
+          <option value="a children's daycare and kindergarten">Kindergarten / Daycare</option>
+          <option value="a museum gallery and exhibition space">Museum Gallery</option>
+          <option value="a luxury yacht interior">Yacht Interior</option>
+          <option value="a private jet interior">Private Jet Interior</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- DYNAMIC FURNITURE / ELEMENTS — populated by JS based on selected space -->
+    <div class="fg" id="int-furniture-wrap" style="display:none;">
+      <label class="fl" id="lbl-int-furniture">Furniture & Elements <span style="color:var(--tx3);font-weight:400;font-size:10px;" id="lbl-int-furniture-hint">(pick what's in the space)</span></label>
+      <div class="tgrid" id="int-furniture"></div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-style">Design Style <span class="req">*</span></label>
+      <select id="int-style">
+        <option value="">— Select —</option>
+        <optgroup label="Modern & Contemporary">
+          <option value="contemporary minimalist">Contemporary Minimalist</option>
+          <option value="luxury modern">Luxury Modern</option>
+          <option value="ultra-modern high-gloss lacquer">Ultra-Modern High-Gloss</option>
+          <option value="soft contemporary warm minimalism">Soft Contemporary</option>
+          <option value="transitional modern-classic fusion">Transitional Modern-Classic</option>
+          <option value="dark moody dramatic contemporary">Dark Moody Dramatic</option>
+          <option value="futuristic sci-fi interior">Futuristic / Sci-Fi</option>
+        </optgroup>
+        <optgroup label="Classic & Heritage">
+          <option value="neoclassical with ornate moldings and columns">Neoclassical</option>
+          <option value="French classical Haussmann-inspired">French Classical / Haussmann</option>
+          <option value="Victorian with rich detailing">Victorian</option>
+          <option value="English manor traditional">English Traditional Manor</option>
+          <option value="Italian Renaissance palazzo style">Italian Renaissance Palazzo</option>
+          <option value="contemporary Arabic with Islamic geometric motifs and mashrabiya elements">Contemporary Arabic / Islamic</option>
+          <option value="Moroccan riad-inspired with zellige and arches">Moroccan Riad</option>
+          <option value="Ottoman-inspired heritage interior">Ottoman Heritage</option>
+          <option value="Mediterranean coastal vernacular">Mediterranean Coastal</option>
+          <option value="Andalusian courtyard style">Andalusian / Moorish</option>
+        </optgroup>
+        <optgroup label="Organic & Lifestyle">
+          <option value="Japandi Japanese-Scandinavian fusion minimalism">Japandi</option>
+          <option value="Wabi-Sabi Japanese imperfect beauty">Wabi-Sabi</option>
+          <option value="Scandinavian hygge warm minimalism">Scandinavian Hygge</option>
+          <option value="biophilic nature-inspired with living plants and natural materials">Biophilic / Nature-Inspired</option>
+          <option value="bohemian eclectic layered maximalism">Bohemian Eclectic</option>
+          <option value="rustic farmhouse with reclaimed wood">Rustic Farmhouse</option>
+          <option value="coastal and nautical beach house">Coastal & Nautical</option>
+          <option value="tropical bali resort inspired">Tropical Resort / Bali Style</option>
+        </optgroup>
+        <optgroup label="Iconic Movements">
+          <option value="Art Deco glamour with geometric patterns and gold">Art Deco Glamour</option>
+          <option value="Mid-Century Modern with organic curves and teak">Mid-Century Modern</option>
+          <option value="industrial chic with exposed brick, steel, and concrete">Industrial Chic</option>
+          <option value="brutalist raw concrete and bold geometry">Brutalist Raw Concrete</option>
+          <option value="Hollywood Regency glam with velvet and brass">Hollywood Regency</option>
+          <option value="maximalist opulent with bold patterns and rich colors">Maximalist Opulence</option>
+          <option value="zen minimalist spa sanctuary">Zen Minimalist Spa</option>
+          <option value="retro 70s earthy tones revival">Retro 70s Revival</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-pal">Color Palette</label>
+      <div class="tgrid" id="int-pal">
+        <div class="tag" onclick="tog(this)" data-val="warm ivory and cream tones">Ivory & Cream</div>
+        <div class="tag" onclick="tog(this)" data-val="pure crisp white neutrals">Pure White</div>
+        <div class="tag" onclick="tog(this)" data-val="warm sandy beige and caramel">Beige & Sand</div>
+        <div class="tag" onclick="tog(this)" data-val="greige warm grey-beige">Greige</div>
+        <div class="tag" onclick="tog(this)" data-val="oatmeal and soft taupe">Oatmeal & Taupe</div>
+        <div class="tag" onclick="tog(this)" data-val="cool light grey and silver">Light Grey</div>
+        <div class="tag" onclick="tog(this)" data-val="warm mid grey tones">Warm Grey</div>
+        <div class="tag" onclick="tog(this)" data-val="deep charcoal and dark grey">Charcoal</div>
+        <div class="tag" onclick="tog(this)" data-val="matte black and obsidian">Matte Black</div>
+        <div class="tag" onclick="tog(this)" data-val="high contrast black and white monochrome">B&W Monochrome</div>
+        <div class="tag" onclick="tog(this)" data-val="rich terracotta, rust, and ochre earth tones">Earth Tones</div>
+        <div class="tag" onclick="tog(this)" data-val="warm terracotta and clay">Terracotta & Clay</div>
+        <div class="tag" onclick="tog(this)" data-val="burnt sienna and rust orange">Rust & Sienna</div>
+        <div class="tag" onclick="tog(this)" data-val="warm camel and tobacco brown">Camel & Tobacco</div>
+        <div class="tag" onclick="tog(this)" data-val="rich chocolate brown and dark walnut">Chocolate Brown</div>
+        <div class="tag" onclick="tog(this)" data-val="deep navy and midnight blue">Navy Blue</div>
+        <div class="tag" onclick="tog(this)" data-val="dusty denim and slate blue">Slate Blue</div>
+        <div class="tag" onclick="tog(this)" data-val="icy blue and arctic tones">Icy Blue</div>
+        <div class="tag" onclick="tog(this)" data-val="deep cobalt and royal blue">Cobalt Blue</div>
+        <div class="tag" onclick="tog(this)" data-val="teal and peacock blue">Teal & Peacock</div>
+        <div class="tag" onclick="tog(this)" data-val="sage green and dusty olive">Sage & Olive</div>
+        <div class="tag" onclick="tog(this)" data-val="deep forest and emerald green">Forest & Emerald</div>
+        <div class="tag" onclick="tog(this)" data-val="soft mint and pistachio green">Mint & Pistachio</div>
+        <div class="tag" onclick="tog(this)" data-val="moss and fern green">Moss Green</div>
+        <div class="tag" onclick="tog(this)" data-val="dusty rose and blush pink">Dusty Rose</div>
+        <div class="tag" onclick="tog(this)" data-val="warm coral and salmon">Coral & Salmon</div>
+        <div class="tag" onclick="tog(this)" data-val="soft peach and apricot">Peach & Apricot</div>
+        <div class="tag" onclick="tog(this)" data-val="deep burgundy and wine red">Burgundy & Wine</div>
+        <div class="tag" onclick="tog(this)" data-val="rich ruby and crimson red">Ruby Red</div>
+        <div class="tag" onclick="tog(this)" data-val="soft lavender and muted purple">Lavender & Mauve</div>
+        <div class="tag" onclick="tog(this)" data-val="deep plum and aubergine">Plum & Aubergine</div>
+        <div class="tag" onclick="tog(this)" data-val="mustard yellow and saffron">Mustard & Saffron</div>
+        <div class="tag" onclick="tog(this)" data-val="warm honey and amber gold">Honey & Amber</div>
+        <div class="tag" onclick="tog(this)" data-val="warm gold and antique brass accents">Gold & Brass</div>
+        <div class="tag" onclick="tog(this)" data-val="rose gold and copper accents">Rose Gold & Copper</div>
+        <div class="tag" onclick="tog(this)" data-val="cool silver and chrome accents">Silver & Chrome</div>
+        <div class="tag" onclick="tog(this)" data-val="jewel tones: emerald, sapphire, amethyst">Jewel Tones</div>
+        <div class="tag" onclick="tog(this)" data-val="warm neutral monochrome tonal scheme">Tonal Neutrals</div>
+        <div class="tag" onclick="tog(this)" data-val="pastel soft muted palette">Soft Pastels</div>
+        <div class="tag" onclick="tog(this)" data-val="bold high-saturation primary colors">Bold Primaries</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-mat">Key Materials</label>
+      <div class="tgrid" id="int-mat">
+        <div class="tag" onclick="tog(this)" data-val="Calacatta marble with dramatic veining">Calacatta Marble</div>
+        <div class="tag" onclick="tog(this)" data-val="Carrara white marble">Carrara Marble</div>
+        <div class="tag" onclick="tog(this)" data-val="Nero Marquina black marble with white veins">Nero Marquina Marble</div>
+        <div class="tag" onclick="tog(this)" data-val="green marble Verde Alpi">Green Marble</div>
+        <div class="tag" onclick="tog(this)" data-val="travertine stone tiles">Travertine</div>
+        <div class="tag" onclick="tog(this)" data-val="backlit onyx stone panels">Backlit Onyx</div>
+        <div class="tag" onclick="tog(this)" data-val="natural limestone">Limestone</div>
+        <div class="tag" onclick="tog(this)" data-val="polished granite">Granite</div>
+        <div class="tag" onclick="tog(this)" data-val="quartzite stone surface">Quartzite</div>
+        <div class="tag" onclick="tog(this)" data-val="polished concrete floors">Polished Concrete</div>
+        <div class="tag" onclick="tog(this)" data-val="microcement seamless walls and floors">Microcement</div>
+        <div class="tag" onclick="tog(this)" data-val="terrazzo composite floor">Terrazzo</div>
+        <div class="tag" onclick="tog(this)" data-val="natural oak wood">Oak Wood</div>
+        <div class="tag" onclick="tog(this)" data-val="rich walnut wood paneling">Walnut</div>
+        <div class="tag" onclick="tog(this)" data-val="warm teak wood">Teak Wood</div>
+        <div class="tag" onclick="tog(this)" data-val="pale ash and birch wood">Ash & Birch</div>
+        <div class="tag" onclick="tog(this)" data-val="dark wenge wood">Wenge Wood</div>
+        <div class="tag" onclick="tog(this)" data-val="herringbone parquet floor">Herringbone Parquet</div>
+        <div class="tag" onclick="tog(this)" data-val="chevron pattern wood floor">Chevron Wood</div>
+        <div class="tag" onclick="tog(this)" data-val="reclaimed and aged timber">Reclaimed Timber</div>
+        <div class="tag" onclick="tog(this)" data-val="fluted ribbed wood slat paneling">Fluted Wood Slats</div>
+        <div class="tag" onclick="tog(this)" data-val="brushed brass hardware and fixtures">Brushed Brass</div>
+        <div class="tag" onclick="tog(this)" data-val="polished gold metal accents">Polished Gold</div>
+        <div class="tag" onclick="tog(this)" data-val="matte black steel frames and profiles">Matte Black Steel</div>
+        <div class="tag" onclick="tog(this)" data-val="polished chrome and satin nickel">Chrome & Nickel</div>
+        <div class="tag" onclick="tog(this)" data-val="copper and aged bronze">Copper & Bronze</div>
+        <div class="tag" onclick="tog(this)" data-val="blackened gunmetal steel">Gunmetal</div>
+        <div class="tag" onclick="tog(this)" data-val="luxurious velvet upholstery">Velvet</div>
+        <div class="tag" onclick="tog(this)" data-val="natural linen fabric">Linen</div>
+        <div class="tag" onclick="tog(this)" data-val="bouclé and teddy fabric upholstery">Bouclé</div>
+        <div class="tag" onclick="tog(this)" data-val="genuine leather furniture">Leather</div>
+        <div class="tag" onclick="tog(this)" data-val="suede and nubuck upholstery">Suede</div>
+        <div class="tag" onclick="tog(this)" data-val="woven wool and tweed">Wool & Tweed</div>
+        <div class="tag" onclick="tog(this)" data-val="silk and satin cushions">Silk & Satin</div>
+        <div class="tag" onclick="tog(this)" data-val="natural cotton and canvas">Cotton & Canvas</div>
+        <div class="tag" onclick="tog(this)" data-val="natural rattan and woven cane">Rattan & Cane</div>
+        <div class="tag" onclick="tog(this)" data-val="woven jute and sisal">Jute & Sisal</div>
+        <div class="tag" onclick="tog(this)" data-val="handwoven wool area rug">Wool Rug</div>
+        <div class="tag" onclick="tog(this)" data-val="fluted ribbed glass panels">Fluted Glass</div>
+        <div class="tag" onclick="tog(this)" data-val="smoked and tinted glass">Smoked Glass</div>
+        <div class="tag" onclick="tog(this)" data-val="clear low-iron glass">Clear Glass</div>
+        <div class="tag" onclick="tog(this)" data-val="mirror and reflective surfaces">Mirror</div>
+        <div class="tag" onclick="tog(this)" data-val="textured lime plaster and tadelakt walls">Lime Plaster / Tadelakt</div>
+        <div class="tag" onclick="tog(this)" data-val="Venetian polished plaster">Venetian Plaster</div>
+        <div class="tag" onclick="tog(this)" data-val="handmade artisan ceramic tile">Handmade Ceramic</div>
+        <div class="tag" onclick="tog(this)" data-val="zellige Moroccan tile">Zellige Tile</div>
+        <div class="tag" onclick="tog(this)" data-val="glazed subway tile">Subway Tile</div>
+        <div class="tag" onclick="tog(this)" data-val="natural brick exposed wall">Exposed Brick</div>
+        <div class="tag" onclick="tog(this)" data-val="acoustic felt wall paneling">Acoustic Felt</div>
+        <div class="tag" onclick="tog(this)" data-val="living green plant wall">Green Plant Wall</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-light">Lighting Mood</label>
+      <select id="int-light">
+        <option value="warm soft ambient evening lighting with subtle accent glow">Warm Ambient — Evening</option>
+        <option value="soft diffused natural daylight from floor-to-ceiling windows">Natural Daylight — Soft & Diffused</option>
+        <option value="golden hour warm sunlight streaming through west-facing windows">Golden Hour — Warm Sunlight</option>
+        <option value="dramatic directional theatrical spotlights with deep pooled shadows">Dramatic Spotlights & Deep Shadows</option>
+        <option value="bright crisp overhead light, clean and evenly lit">Bright Overhead — Clean & Crisp</option>
+        <option value="moody dim atmospheric candlelight and intimate glow">Candlelit & Intimate</option>
+        <option value="cool blue-white modern LED recessed lighting">Cool Modern LED</option>
+        <option value="mixed natural daylight with warm cove accent lighting">Mixed: Natural + Warm Cove</option>
+        <option value="backlit wall panels and glowing architectural niches">Backlit Panels & Glowing Niches</option>
+        <option value="overcast soft diffused northern light with no harsh shadows">Overcast Northern Light</option>
+        <option value="sunrise morning light with long warm horizontal rays">Sunrise Morning Light</option>
+        <option value="neon and colored accent lighting for moody atmosphere">Neon & Colored Accents</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-shot">Shot Type</label>
+      <select id="int-shot">
+        <option value="wide-angle architectural shot showing the full room with spatial depth">Wide — Full Room (Architectural)</option>
+        <option value="close-up detail shot focused on material texture and surface quality">Close-Up Detail / Texture</option>
+        <option value="medium shot framing a main furniture grouping as focal point">Medium — Furniture Focal Point</option>
+        <option value="perfectly symmetrical centered frontal elevation view">Symmetrical Frontal Elevation</option>
+        <option value="cinematic three-quarter angled view with strong perspective lines">Cinematic 3/4 Angle</option>
+        <option value="bird's-eye overhead top-down view">Bird's Eye / Top-Down</option>
+        <option value="corner shot capturing two walls meeting in perspective">Corner Shot</option>
+        <option value="through-the-doorway framed vignette view into the space">Doorway Vignette</option>
+        <option value="split-level view showing multiple zones of the space">Split-Level Multi-Zone</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-lens">Camera Lens</label>
+      <select id="int-lens">
+        <option value="14mm ultra-wide rectilinear lens with corrected verticals">14mm Ultra-Wide</option>
+        <option value="16mm wide-angle architectural lens">16mm Wide-Angle</option>
+        <option value="24mm architectural lens at f/8 sharp throughout">24mm Architectural f/8</option>
+        <option value="35mm lens at f/5.6">35mm Standard</option>
+        <option value="50mm lens at f/4 natural human perspective">50mm Natural</option>
+        <option value="85mm lens at f/2.8 with shallow depth of field and soft bokeh">85mm f/2.8 Shallow Bokeh</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-int-use">Purpose / Use</label>
+      <select id="int-use">
+        <option value="for a luxury real estate listing">Luxury Real Estate Listing</option>
+        <option value="for an interior design editorial magazine spread">Design Magazine Editorial</option>
+        <option value="for a client design presentation">Client Presentation</option>
+        <option value="for an Instagram portfolio post">Instagram Portfolio</option>
+        <option value="for an architectural award submission">Award Submission</option>
+        <option value="for a luxury brand brochure">Luxury Brand Brochure</option>
+        <option value="for a product catalog">Product Catalog</option>
+        <option value="for social media content">Social Media Content</option>
+        <option value="for a construction site design visualization">Construction Visualization</option>
+      </select>
+    </div>
+  </div><!-- end INTERIOR -->
+
+  <!-- ══════ ARCHITECTURE PANEL ══════ -->
+  <div class="cpanel" id="panel-arch">
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-bldg">Building Type <span class="req">*</span></label>
+      <select id="arch-bldg">
+        <option value="">— Select —</option>
+        <optgroup label="Residential">
+          <option value="a luxury standalone villa">Luxury Standalone Villa</option>
+          <option value="a contemporary high-rise residential tower">High-Rise Residential Tower</option>
+          <option value="a luxury townhouse">Luxury Townhouse</option>
+          <option value="a waterfront beach house">Waterfront Beach House</option>
+          <option value="a minimal desert residence">Desert Minimalist Residence</option>
+          <option value="a mountain chalet">Mountain Chalet</option>
+          <option value="an overwater floating villa">Overwater Floating Villa</option>
+          <option value="a treehouse resort retreat">Treehouse Retreat</option>
+        </optgroup>
+        <optgroup label="Hospitality & Commercial">
+          <option value="a landmark luxury hotel">Landmark Luxury Hotel</option>
+          <option value="a boutique design hotel">Boutique Design Hotel</option>
+          <option value="a corporate headquarters building">Corporate Headquarters</option>
+          <option value="a mixed-use retail and office tower">Mixed-Use Tower</option>
+          <option value="a high-end shopping mall">Shopping Mall</option>
+          <option value="a retail luxury pavilion">Luxury Retail Pavilion</option>
+          <option value="a data center complex">Data Center Complex</option>
+        </optgroup>
+        <optgroup label="Cultural, Civic & Religious">
+          <option value="a contemporary mosque with modern Islamic architecture">Contemporary Mosque</option>
+          <option value="a cultural arts museum">Arts Museum</option>
+          <option value="a performing arts center and concert hall">Concert Hall / Opera House</option>
+          <option value="a public library and civic center">Public Library & Civic Center</option>
+          <option value="a university campus building">University Campus Building</option>
+          <option value="an international airport terminal">Airport Terminal</option>
+          <option value="a sports stadium">Sports Stadium</option>
+          <option value="a hospital and medical complex">Hospital & Medical Complex</option>
+          <option value="a national parliament building">Parliament Building</option>
+          <option value="a memorial and monument">Memorial & Monument</option>
+        </optgroup>
+        <optgroup label="Infrastructure">
+          <option value="a landmark pedestrian bridge">Landmark Pedestrian Bridge</option>
+          <option value="a metro transit station">Metro Transit Station</option>
+          <option value="a solar energy facility">Solar Energy Facility</option>
+          <option value="a wastewater treatment facility as architecture">Environmental Architecture</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-style">Architectural Style <span class="req">*</span></label>
+      <select id="arch-style">
+        <option value="">— Select —</option>
+        <optgroup label="Contemporary">
+          <option value="contemporary minimalist modernist">Contemporary Minimalist</option>
+          <option value="parametric digital architecture with algorithmic surfaces">Parametric Digital</option>
+          <option value="deconstructivist fractured form inspired by Zaha Hadid">Deconstructivist</option>
+          <option value="High-Tech structural expressionism with exposed systems">High-Tech / Structural Expressionism</option>
+          <option value="Neo-Futurist biomorphic flowing form">Neo-Futurist</option>
+          <option value="organic biomorphic soft curved architecture">Organic Biomorphic</option>
+          <option value="soft curvilinear modernism with sinuous facades">Curvilinear Modernism</option>
+          <option value="stacked modular Tetris-like building composition">Stacked Modular</option>
+        </optgroup>
+        <optgroup label="Classical & Regional">
+          <option value="neoclassical with grand columns and pediments">Neoclassical</option>
+          <option value="contemporary Islamic architecture with geometric muqarnas patterns">Contemporary Islamic</option>
+          <option value="Andalusian Moorish architecture with horseshoe arches">Andalusian Moorish</option>
+          <option value="Ottoman revival architecture with domes and minarets">Ottoman Revival</option>
+          <option value="traditional Mediterranean regional vernacular">Mediterranean Vernacular</option>
+          <option value="Japanese Zen minimalist architecture">Japanese Zen</option>
+        </optgroup>
+        <optgroup label="Radical & Sustainable">
+          <option value="Brutalist exposed raw concrete monumentalism">Brutalist</option>
+          <option value="adaptive reuse industrial building conversion">Adaptive Reuse / Industrial</option>
+          <option value="mass timber and biophilic passive architecture">Mass Timber & Biophilic</option>
+          <option value="sustainable net-zero eco-architecture with green systems">Sustainable Eco-Architecture</option>
+          <option value="postmodern contextual architecture">Postmodern</option>
+          <option value="sculptural expressionist unique form">Sculptural Expressionist</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-fac">Facade Material</label>
+      <div class="tgrid" id="arch-fac">
+        <div class="tag" onclick="tog(this)" data-val="exposed raw concrete board-formed">Exposed Concrete</div>
+        <div class="tag" onclick="tog(this)" data-val="full-height glass curtain wall">Glass Curtain Wall</div>
+        <div class="tag" onclick="tog(this)" data-val="weathering Corten steel panels">Corten Steel</div>
+        <div class="tag" onclick="tog(this)" data-val="polished white render and plaster">White Plaster Render</div>
+        <div class="tag" onclick="tog(this)" data-val="natural limestone cladding">Limestone Cladding</div>
+        <div class="tag" onclick="tog(this)" data-val="terracotta ceramic louvers and brise-soleil">Terracotta Louvers</div>
+        <div class="tag" onclick="tog(this)" data-val="charred shou-sugi-ban timber cladding">Charred Timber</div>
+        <div class="tag" onclick="tog(this)" data-val="perforated anodized aluminum panels">Perforated Aluminum</div>
+        <div class="tag" onclick="tog(this)" data-val="handmade brick in running bond">Handmade Brick</div>
+        <div class="tag" onclick="tog(this)" data-val="Islamic mashrabiya carved lattice screen">Mashrabiya Screen</div>
+        <div class="tag" onclick="tog(this)" data-val="polished black granite cladding">Black Granite</div>
+        <div class="tag" onclick="tog(this)" data-val="reflective mirror-finish stainless steel">Mirror Steel</div>
+        <div class="tag" onclick="tog(this)" data-val="cross-laminated mass timber CLT panels">Mass Timber CLT</div>
+        <div class="tag" onclick="tog(this)" data-val="green living plant wall facade">Living Plant Wall</div>
+        <div class="tag" onclick="tog(this)" data-val="GFRC glass fibre reinforced concrete panels">GFRC Panels</div>
+        <div class="tag" onclick="tog(this)" data-val="copper cladding with natural patina">Copper Patina</div>
+        <div class="tag" onclick="tog(this)" data-val="translucent ETFE pillow facade">ETFE Translucent</div>
+        <div class="tag" onclick="tog(this)" data-val="integrated photovoltaic solar glass panels">Solar PV Glass</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-light">Time of Day / Lighting</label>
+      <select id="arch-light">
+        <option value="golden hour dusk with warm amber glowing sky and long raking shadows">Golden Hour — Dusk</option>
+        <option value="blue hour twilight with deep violet sky and city lights emerging">Blue Hour — Twilight</option>
+        <option value="dramatic sunrise with intense horizontal warm light and long shadows">Dramatic Sunrise</option>
+        <option value="harsh midday equatorial sun with sharp crisp cast shadows">Midday Harsh Sun</option>
+        <option value="soft overcast diffused grey sky, shadowless even light">Overcast — Shadowless</option>
+        <option value="night time with dramatic facade illumination and lit interior glow">Night — Illuminated Facade</option>
+        <option value="stormy dramatic dark moody clouds and charged sky">Stormy Dramatic Sky</option>
+        <option value="bright clear blue sky with sharp sunlight and vivid shadows">Clear Blue Sky — Sharp Light</option>
+        <option value="rain-slicked ground reflections at dusk, wet pavement mirror effect">Rainy Dusk — Wet Reflections</option>
+        <option value="golden autumn late afternoon light, warm amber cast">Autumn Late Afternoon</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-ctx">Site Context</label>
+      <select id="arch-ctx">
+        <option value="dense urban city center surrounded by skyscraper skyline">Urban City Center</option>
+        <option value="waterfront site with glassy water reflections below">Waterfront</option>
+        <option value="arid desert landscape with sand dunes in the distance">Desert Landscape</option>
+        <option value="lush tropical landscape with palm trees and dense vegetation">Tropical Lush</option>
+        <option value="dramatic mountainous rocky terrain">Mountain Rocky Terrain</option>
+        <option value="coastal clifftop site overlooking the sea">Coastal Clifftop</option>
+        <option value="dense forest and woodland clearing">Forest Clearing</option>
+        <option value="historic dense urban fabric with heritage context">Historic Urban Context</option>
+        <option value="open green suburban environment with mature trees">Suburban Green</option>
+        <option value="pure white background — clean architectural visualization">White Background (Clean Viz)</option>
+        <option value="arctic tundra and snow-covered landscape">Arctic / Snow Landscape</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-view">View & Shot Type</label>
+      <select id="arch-view">
+        <option value="street level hero exterior shot at pedestrian eye height">Street Level — Hero Shot</option>
+        <option value="aerial drone view looking down at roofscape from above">Aerial Drone — Top View</option>
+        <option value="three-quarter view showing two facade faces simultaneously">3/4 View — Two Facades</option>
+        <option value="dramatic low-angle upward shot emphasizing full building height">Low-Angle — Looking Up</option>
+        <option value="distant wide establishing shot with building fully in context">Establishing Wide Shot</option>
+        <option value="interior courtyard view looking upward at sky above">Courtyard Looking Up</option>
+        <option value="architectural axonometric exploded diagram view">Axonometric Exploded</option>
+        <option value="section perspective cut-through revealing interior spaces">Section Perspective Cut</option>
+        <option value="through-the-frame shot with foreground framing element">Framed Vignette Shot</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-arch-feat">Special Features</label>
+      <div class="tgrid" id="arch-feat">
+        <div class="tag" onclick="tog(this)" data-val="extensive green rooftop garden">Green Roof Garden</div>
+        <div class="tag" onclick="tog(this)" data-val="dramatic cantilevered volume jutting out dramatically">Cantilever</div>
+        <div class="tag" onclick="tog(this)" data-val="infinity rooftop pool with panoramic city views">Infinity Rooftop Pool</div>
+        <div class="tag" onclick="tog(this)" data-val="sky bridge connecting two towers mid-air">Sky Bridge</div>
+        <div class="tag" onclick="tog(this)" data-val="dramatic daylit atrium void with natural light shaft">Daylit Atrium</div>
+        <div class="tag" onclick="tog(this)" data-val="cascading waterfall feature on facade">Facade Waterfall</div>
+        <div class="tag" onclick="tog(this)" data-val="vertical living plant wall system">Living Plant Wall</div>
+        <div class="tag" onclick="tog(this)" data-val="integrated solar photovoltaic skin">Solar PV Skin</div>
+        <div class="tag" onclick="tog(this)" data-val="grand double-height entrance portal">Grand Entrance Portal</div>
+        <div class="tag" onclick="tog(this)" data-val="twisting rotating tower form">Twisting Tower</div>
+        <div class="tag" onclick="tog(this)" data-val="underground subterranean levels revealed">Subterranean Levels</div>
+        <div class="tag" onclick="tog(this)" data-val="transparent glass floor and walkways">Glass Floor / Walkway</div>
+      </div>
+    </div>
+  </div><!-- end ARCHITECTURE -->
+
+  <!-- ══════ URBAN DESIGN PANEL ══════ -->
+  <div class="cpanel" id="panel-urban">
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-type">Urban Project Type <span class="req">*</span></label>
+      <select id="urb-type">
+        <option value="">— Select —</option>
+        <optgroup label="Public Spaces">
+          <option value="a vibrant urban plaza with active pedestrian life">Urban Plaza</option>
+          <option value="a waterfront promenade and boardwalk">Waterfront Promenade</option>
+          <option value="a lush urban park in a dense city context">Urban Park</option>
+          <option value="a pedestrianized street with outdoor cafés and retail">Pedestrian Street</option>
+          <option value="a traditional covered souk and market">Covered Souk & Market</option>
+          <option value="a pocket park and community garden">Pocket Park</option>
+          <option value="a civic square and public gathering space">Civic Square</option>
+          <option value="a children's adventure playground">Children's Playground</option>
+          <option value="a beachfront public space">Beachfront Public Space</option>
+        </optgroup>
+        <optgroup label="Neighborhoods & Districts">
+          <option value="a master-planned mixed-use urban neighborhood">Mixed-Use Neighborhood</option>
+          <option value="a transit-oriented development TOD hub around a metro station">Transit-Oriented Development (TOD)</option>
+          <option value="a historic city center revitalization project">Historic City Center Revitalization</option>
+          <option value="a futuristic smart city district">Smart City District</option>
+          <option value="an affordable housing social neighborhood">Affordable Housing Neighborhood</option>
+          <option value="a creative arts and cultural quarter">Arts & Culture District</option>
+          <option value="a university campus masterplan">University Campus</option>
+          <option value="a healthcare district campus">Healthcare District</option>
+        </optgroup>
+        <optgroup label="Infrastructure & Planning">
+          <option value="a green mobility corridor for cyclists and pedestrians">Green Mobility Corridor</option>
+          <option value="a highway elevated park High Line transformation">Highway-to-Park (High Line)</option>
+          <option value="a large-scale coastal urban development">Coastal Urban Development</option>
+          <option value="a new city satellite town masterplan aerial view">New City Masterplan — Aerial</option>
+          <option value="a water-sensitive urban design with bioswales and rain gardens">Water-Sensitive Urban Design</option>
+          <option value="a port and harbor waterfront regeneration">Port & Harbor Regeneration</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-char">Urban Design Character</label>
+      <select id="urb-char">
+        <option value="contemporary sustainable urban design">Contemporary Sustainable</option>
+        <option value="futuristic smart city aesthetic">Futuristic Smart City</option>
+        <option value="Mediterranean walkable urban character with shaded arcades">Mediterranean Walkable</option>
+        <option value="traditional Arab-Islamic urban fabric and street pattern">Arab-Islamic Vernacular</option>
+        <option value="Scandinavian green urbanism with cycling culture">Scandinavian Green</option>
+        <option value="neo-traditional New Urbanism with walkable blocks">Neo-Traditional New Urbanism</option>
+        <option value="industrial waterfront revitalization">Industrial Waterfront Revitalization</option>
+        <option value="biophilic tropical city integrated with nature">Biophilic Tropical City</option>
+        <option value="15-minute city concept with walkable mixed-use blocks">15-Minute City</option>
+        <option value="historic preservation and adaptive reuse urban strategy">Historic Preservation</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-elem">Urban Elements</label>
+      <div class="tgrid" id="urb-elem">
+        <div class="tag" onclick="tog(this)" data-val="wide pedestrian-only zones">Pedestrian Zones</div>
+        <div class="tag" onclick="tog(this)" data-val="mature tree-lined boulevards">Tree-Lined Streets</div>
+        <div class="tag" onclick="tog(this)" data-val="reflecting pool and water canal">Water Canal</div>
+        <div class="tag" onclick="tog(this)" data-val="vibrant outdoor café terraces">Outdoor Cafés</div>
+        <div class="tag" onclick="tog(this)" data-val="protected cycle tracks">Cycle Tracks</div>
+        <div class="tag" onclick="tog(this)" data-val="large-scale public art installations">Public Art</div>
+        <div class="tag" onclick="tog(this)" data-val="street food market and kiosks">Street Market</div>
+        <div class="tag" onclick="tog(this)" data-val="green bioswale rain garden corridors">Green Corridors</div>
+        <div class="tag" onclick="tog(this)" data-val="solar shading canopy structures and pergolas">Shading Canopies</div>
+        <div class="tag" onclick="tog(this)" data-val="children's play areas and water play features">Play Areas</div>
+        <div class="tag" onclick="tog(this)" data-val="dramatic night urban lighting design">Night Lighting</div>
+        <div class="tag" onclick="tog(this)" data-val="rooftop terraces and sky gardens">Rooftop Gardens</div>
+        <div class="tag" onclick="tog(this)" data-val="active mixed-use ground floor activation">Active Ground Floor</div>
+        <div class="tag" onclick="tog(this)" data-val="urban furniture and seating elements">Urban Furniture</div>
+        <div class="tag" onclick="tog(this)" data-val="landmark sculptural pavilion">Sculptural Pavilion</div>
+        <div class="tag" onclick="tog(this)" data-val="smart benches and EV charging points">Smart Street Furniture</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-life">Activity & People</label>
+      <select id="urb-life">
+        <option value="bustling with diverse pedestrian activity, outdoor dining, and urban energy">Vibrant & Busy</option>
+        <option value="quiet early morning atmosphere with joggers and minimal activity">Quiet Morning</option>
+        <option value="warm evening golden social gathering with ambient lighting">Evening Social Gathering</option>
+        <option value="diverse multigenerational community life with all ages">Diverse Community Life</option>
+        <option value="active mobility scene with cyclists, walkers, and scooters">Active Mobility</option>
+        <option value="intentionally unpopulated to clearly showcase the design and landscape">Empty — Design Focus</option>
+        <option value="weekend market day with crowds and stalls">Weekend Market Day</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-rend">Rendering Style</label>
+      <select id="urb-rend">
+        <option value="photorealistic 3D visualization">Photorealistic 3D Viz</option>
+        <option value="aerial drone photorealistic render">Aerial Drone — Photorealistic</option>
+        <option value="architectural watercolor render with human figures">Watercolor Render</option>
+        <option value="technical axonometric diagram">Axonometric Diagram</option>
+        <option value="sketch and photorealistic hybrid render">Sketch + Realistic Hybrid</option>
+        <option value="night render with artificial urban lighting scheme">Night Render</option>
+        <option value="illustrative graphic urban infographic poster">Urban Infographic Poster</option>
+        <option value="concept mood board collage">Mood Board Collage</option>
+        <option value="pencil line drawing masterplan">Pencil Masterplan Drawing</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-urb-scale">Scale & View</label>
+      <select id="urb-scale">
+        <option value="street-level pedestrian perspective from within the space">Street Level — Inside Space</option>
+        <option value="mid-level 45-degree bird's-eye view">Mid-Level 45° Bird's Eye</option>
+        <option value="high aerial view revealing the full masterplan layout">High Aerial — Full Masterplan</option>
+        <option value="close vignette focused on a specific urban moment or detail">Urban Moment Vignette</option>
+        <option value="section cut through the urban landscape layers">Urban Section Cut</option>
+      </select>
+    </div>
+  </div><!-- end URBAN -->
+
+  <!-- ══════ PRODUCT DESIGN PANEL ══════ -->
+  <div class="cpanel" id="panel-prod">
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-type">Product Type <span class="req">*</span></label>
+      <select id="prod-type">
+        <option value="">— Select —</option>
+        <optgroup label="Furniture & Lighting">
+          <option value="a designer lounge armchair">Designer Lounge Chair</option>
+          <option value="a luxury sofa">Luxury Sofa</option>
+          <option value="a dining table">Dining Table</option>
+          <option value="a coffee table">Coffee Table</option>
+          <option value="a side table and accent furniture">Side Table / Accent Piece</option>
+          <option value="a shelving unit and bookcase">Shelving / Bookcase</option>
+          <option value="a luxury bed frame and headboard">Bed Frame & Headboard</option>
+          <option value="a bathroom vanity and mirror unit">Bathroom Vanity</option>
+          <option value="a pendant ceiling light fixture">Pendant Light</option>
+          <option value="a floor lamp">Floor Lamp</option>
+          <option value="a table lamp">Table Lamp</option>
+          <option value="a wall sconce">Wall Sconce</option>
+          <option value="a chandelier">Chandelier</option>
+        </optgroup>
+        <optgroup label="Decorative & Objects">
+          <option value="a decorative vase">Decorative Vase</option>
+          <option value="a sculptural art object">Sculptural Art Object</option>
+          <option value="a luxury candle in a glass vessel">Luxury Candle</option>
+          <option value="artisan tableware and ceramic dishes set">Artisan Tableware Set</option>
+          <option value="a woven textile and cushion">Woven Textile & Cushion</option>
+          <option value="a mirror with decorative frame">Decorative Mirror</option>
+          <option value="a wall art panel">Wall Art Panel</option>
+        </optgroup>
+        <optgroup label="Electronics & Tech">
+          <option value="a premium wireless speaker">Premium Wireless Speaker</option>
+          <option value="a luxury smartwatch">Luxury Smartwatch</option>
+          <option value="a designer laptop">Designer Laptop</option>
+          <option value="a premium over-ear headphones">Premium Headphones</option>
+          <option value="a smart home hub device">Smart Home Device</option>
+          <option value="a designer camera">Designer Camera</option>
+          <option value="a futuristic concept phone">Concept Smartphone</option>
+        </optgroup>
+        <optgroup label="Fashion & Luxury">
+          <option value="a luxury leather handbag">Luxury Leather Handbag</option>
+          <option value="a luxury perfume bottle">Luxury Perfume Bottle</option>
+          <option value="a pair of designer sneakers">Designer Sneakers</option>
+          <option value="a fine jewelry ring or necklace">Fine Jewelry — Ring / Necklace</option>
+          <option value="a luxury mechanical wristwatch">Luxury Mechanical Watch</option>
+          <option value="a pair of designer sunglasses">Designer Sunglasses</option>
+          <option value="a luxury silk scarf">Luxury Silk Scarf</option>
+          <option value="a designer belt and accessories">Designer Belt & Accessories</option>
+        </optgroup>
+        <optgroup label="Kitchen & Lifestyle">
+          <option value="a premium kitchen appliance — espresso machine">Espresso Machine</option>
+          <option value="a premium knife set">Premium Knife Set</option>
+          <option value="a luxury water bottle or flask">Luxury Water Bottle / Flask</option>
+          <option value="a premium skincare product bottle and packaging">Skincare Packaging</option>
+          <option value="a luxury food packaging box">Luxury Packaging Box</option>
+          <option value="an artisan cutting board">Artisan Cutting Board</option>
+        </optgroup>
+        <optgroup label="Vehicles & Transport">
+          <option value="a luxury sports car exterior">Luxury Sports Car</option>
+          <option value="a luxury SUV exterior">Luxury SUV</option>
+          <option value="a luxury car interior dashboard and cabin">Car Interior Dashboard</option>
+          <option value="a designer electric scooter">Electric Scooter Design</option>
+          <option value="a designer electric bicycle">Electric Bicycle Design</option>
+          <option value="a luxury yacht exterior">Luxury Yacht Exterior</option>
+          <option value="a private jet interior cabin">Private Jet Cabin</option>
+          <option value="a concept drone">Concept Drone</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-style">Photography Style</label>
+      <select id="prod-style">
+        <option value="luxury studio product photography on pure white background, perfectly lit">Studio — Pure White Background</option>
+        <option value="editorial lifestyle product in a styled interior environment">Editorial Lifestyle</option>
+        <option value="dramatic dark moody background luxury product shot with rim light">Dark Dramatic Background</option>
+        <option value="minimal floating product on clean gradient background">Floating Gradient</option>
+        <option value="in-situ contextual product photographed in a real interior setting">In-Context Interior</option>
+        <option value="3D CGI hero product render">3D CGI Hero Render</option>
+        <option value="flat lay top-down overhead product arrangement">Flat Lay — Top-Down</option>
+        <option value="macro extreme close-up on surface detail and texture">Macro Detail Close-Up</option>
+        <option value="product in use in motion with human hand interacting">In-Use with Human Hand</option>
+        <option value="outdoor lifestyle product photography in natural setting">Outdoor Lifestyle</option>
+        <option value="luxury product with smoke, mist, or water splash effect">Special Effect — Smoke / Mist</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-mat">Product Material</label>
+      <select id="prod-mat">
+        <option value="">— Select Material —</option>
+        <option value="solid polished brass with warm metallic sheen">Polished Brass</option>
+        <option value="matte brushed aluminum with industrial finish">Matte Brushed Aluminum</option>
+        <option value="stainless steel mirror polished finish">Mirror Polished Steel</option>
+        <option value="hand-blown borosilicate glass">Hand-Blown Glass</option>
+        <option value="solid walnut or oak wood with visible grain">Solid Walnut / Oak</option>
+        <option value="genuine full-grain Italian leather">Italian Full-Grain Leather</option>
+        <option value="matte soft-touch rubberized coating">Soft-Touch Rubber</option>
+        <option value="hand-painted ceramic with artisan glaze">Hand-Painted Ceramic</option>
+        <option value="woven carbon fiber texture">Carbon Fiber Weave</option>
+        <option value="travertine and natural stone">Natural Stone / Travertine</option>
+        <option value="gradient resin and colored acrylic">Resin & Acrylic</option>
+        <option value="woven rattan and natural plant fiber">Rattan & Natural Fiber</option>
+        <option value="raw unfinished concrete with aggregate texture">Raw Concrete</option>
+        <option value="high-gloss lacquer piano finish">High-Gloss Lacquer</option>
+        <option value="recycled ocean plastic with visible texture">Recycled Ocean Plastic</option>
+        <option value="hammered textured metal surface">Hammered Metal</option>
+        <option value="translucent frosted glass effect">Frosted Translucent Glass</option>
+        <option value="woven linen and natural textile">Woven Linen Textile</option>
+        <option value="polished obsidian black stone">Polished Obsidian</option>
+        <option value="titanium and aerospace alloy">Titanium Alloy</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-color">Product Color</label>
+      <select id="prod-color">
+        <option value="matte black">Matte Black</option>
+        <option value="glossy piano black">Glossy Piano Black</option>
+        <option value="pure crisp white">Pure White</option>
+        <option value="warm cream and ivory">Cream & Ivory</option>
+        <option value="warm brushed gold">Warm Gold</option>
+        <option value="rose gold metallic">Rose Gold</option>
+        <option value="silver chrome metallic">Silver Chrome</option>
+        <option value="deep navy blue">Deep Navy Blue</option>
+        <option value="emerald deep green">Emerald Green</option>
+        <option value="rich burgundy red">Burgundy Red</option>
+        <option value="warm terracotta and clay">Terracotta & Clay</option>
+        <option value="pale sage green">Pale Sage Green</option>
+        <option value="soft dusty rose pink">Dusty Rose Pink</option>
+        <option value="translucent frosted glass look">Frosted Translucent</option>
+        <option value="deep forest green">Forest Green</option>
+        <option value="deep cobalt blue">Cobalt Blue</option>
+        <option value="mustard yellow">Mustard Yellow</option>
+        <option value="burnt orange">Burnt Orange</option>
+        <option value="lavender purple">Lavender Purple</option>
+        <option value="sand and warm beige">Sand & Warm Beige</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-light">Lighting Setup</label>
+      <select id="prod-light">
+        <option value="soft studio box lighting, evenly lit, no harsh shadows">Soft Studio Box Light</option>
+        <option value="dramatic single side key light casting deep atmospheric shadow">Dramatic Side Key Light</option>
+        <option value="rim backlighting creating a glowing product silhouette">Rim / Backlight Silhouette</option>
+        <option value="warm natural golden window light from the side">Warm Window Light</option>
+        <option value="gradient neon ambient glow atmosphere">Neon Ambient Glow</option>
+        <option value="ring light macro sharp even illumination for close-up">Macro Ring Light</option>
+        <option value="warm sunrise morning light raking from the side">Sunrise Side Light</option>
+        <option value="three-point studio lighting setup">Three-Point Studio Setup</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-cam">Camera Angle</label>
+      <select id="prod-cam">
+        <option value="front-facing centered hero shot on 50mm lens">Front Hero — 50mm</option>
+        <option value="three-quarter angled view showing depth, form, and dimension">3/4 Angle — Depth & Form</option>
+        <option value="top-down flat lay overhead view">Top-Down Flat Lay</option>
+        <option value="macro extreme close-up on surface detail and texture quality">Macro Surface Detail</option>
+        <option value="low-angle upward dramatic shot showing scale and presence">Low-Angle Dramatic</option>
+        <option value="clean minimal side profile view">Side Profile — Minimal</option>
+        <option value="diagonal dynamic composition with motion blur">Diagonal Dynamic + Blur</option>
+        <option value="360-degree turntable style side view">Turntable Side View</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-prod-use">Image Purpose</label>
+      <select id="prod-use">
+        <option value="for a luxury e-commerce product page">Luxury E-Commerce Page</option>
+        <option value="for an editorial design magazine feature">Design Magazine Feature</option>
+        <option value="for a brand campaign and advertising">Brand Campaign / Ad</option>
+        <option value="for a social media product showcase post">Social Media Showcase</option>
+        <option value="for a product design portfolio">Design Portfolio</option>
+        <option value="for packaging and retail display">Packaging & Retail Display</option>
+        <option value="for a product launch presentation">Product Launch Presentation</option>
+      </select>
+    </div>
+  </div><!-- end PRODUCT -->
+
+  <!-- ══ ADVANCED / SHARED ══ -->
+  <div class="sep"></div>
+  <button class="adv-btn" onclick="toggleAdv()" id="advBtn">+ Advanced Options</button>
+  <div class="adv-sec" id="advSec">
+
+    <div class="fg">
+      <label class="fl" id="lbl-adv-ratio">Aspect Ratio</label>
+      <select id="adv-ratio">
+        <option value="16:9 widescreen format">16:9 — Widescreen</option>
+        <option value="4:5 portrait format">4:5 — Instagram Feed</option>
+        <option value="1:1 square format">1:1 — Square</option>
+        <option value="9:16 vertical portrait format">9:16 — Reels / Story</option>
+        <option value="3:2 standard photo format">3:2 — Standard Photo</option>
+        <option value="21:9 ultra-wide cinematic format">21:9 — Cinematic Ultra-Wide</option>
+        <option value="A3 landscape print format">A3 Landscape — Print</option>
+        <option value="A4 portrait print format">A4 Portrait — Print</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-adv-qual">Output Quality</label>
+      <select id="adv-qual">
+        <option value="photorealistic 4K ultra-high definition">4K Photorealistic</option>
+        <option value="editorial photography quality">Editorial Photography</option>
+        <option value="professional architectural visualization quality">Arch Viz Professional</option>
+        <option value="high-resolution print quality">High-Res Print</option>
+        <option value="cinematic film quality">Cinematic Film Quality</option>
+      </select>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-adv-txt">Text in Image (exact wording)</label>
+      <input type="text" id="adv-txt" placeholder='e.g. "Interior Zone" · only if text needed in image'>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-adv-edit">Edit Delta (Edit intent only)</label>
+      <textarea id="adv-edit" style="min-height:48px;" placeholder="Describe only what to CHANGE in the attached image..."></textarea>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="lbl-adv-notes">Extra Notes / Constraints</label>
+      <textarea id="adv-notes" style="min-height:48px;" placeholder="Egyptian context, no people, no text watermark, brand color #0077B6..."></textarea>
+    </div>
+  </div>
+
+  <button class="genbtn" onclick="buildPrompt()" id="genBtn">✦ Build Prompt</button>
+
+</div><!-- end SIDEBAR -->
+
+<!-- ════ MAIN COLUMN ════ -->
+<div class="main-col">
+
+  <!-- OUTPUT CARD -->
+  <div class="ocard">
+    <div class="ohdr">
+      <div class="ohdr-l">
+        <div class="itag" id="intentLabel">GENERATE</div>
+        <span class="ccount" id="charCount">0 / 1000</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-cp" id="copyBtn" onclick="copyPrmt()" style="display:none;">Copy Prompt</button>
+        <button class="btn btn-gh" onclick="clearAll()" id="clearBtn" style="font-size:10px;">Clear</button>
+      </div>
+    </div>
+    <div class="obody">
+      <div class="ldots" id="ldots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <p class="ophld" id="ophld">Choose your options and click ✦ Build Prompt</p>
+      <p class="oprmt" id="oprmt"></p>
+    </div>
+    <div class="cbar"><div class="cbar-f" id="cbarF" style="width:0%"></div></div>
+    <div class="ofoot" id="ofoot">
+      <button class="btn btn-cp" onclick="copyPrmt()" id="copyBtn2">Copy Prompt</button>
+      <button class="btn btn-gh" onclick="buildPrompt()" id="regenBtn" style="font-size:10px;">Regenerate</button>
+    </div>
+  </div>
+
+</div><!-- end MAIN -->
+</div><!-- end LAYOUT -->
+
+<script>
+/* ═══════════ STATE ═══════════ */
+let L = 'en'; // current language
+let model = 'gemini-3-pro-image-preview';
+let intent = 'GENERATE';
+let cat = 'int';
+let uploadedImages = []; // array of {dataUrl, name}
+
+/* ═══════════ TRANSLATIONS ═══════════ */
+const T = {
+  en: {
+    hdr_sub: 'AI Tools Suite',
+    tool_lbl: 'Nano Banana <span>Prompt Builder</span>',
+    lang_btn: 'عربي',
+    lbl_intent: 'Intent',
+    lbl_cat: 'Category',
+    lbl_ref: 'Reference Images',
+    lbl_ref_sub: 'Upload up to 15 images — helps Claude describe better',
+    clear_imgs: 'Clear all',
+    upload_lbl: '<strong>Click to upload</strong> or drag & drop',
+    upload_hint: 'JPG · PNG · WEBP — or paste (Ctrl+V) — max 15',
+    lbl_int_space: 'Space Type <span class="req">*</span>',
+    lbl_int_style: 'Design Style <span class="req">*</span>',
+    lbl_int_pal: 'Color Palette',
+    lbl_int_mat: 'Key Materials',
+    lbl_int_light: 'Lighting Mood',
+    lbl_int_shot: 'Shot Type',
+    lbl_int_lens: 'Camera Lens',
+    lbl_int_use: 'Purpose / Use',
+    lbl_int_furniture: 'Furniture & Elements',
+    lbl_int_furniture_hint: "(pick what's in the space)",
+    lbl_arch_bldg: 'Building Type <span class="req">*</span>',
+    lbl_arch_style: 'Architectural Style <span class="req">*</span>',
+    lbl_arch_fac: 'Facade Material',
+    lbl_arch_light: 'Time of Day / Lighting',
+    lbl_arch_ctx: 'Site Context',
+    lbl_arch_view: 'View & Shot Type',
+    lbl_arch_feat: 'Special Features',
+    lbl_urb_type: 'Urban Project Type <span class="req">*</span>',
+    lbl_urb_char: 'Urban Design Character',
+    lbl_urb_elem: 'Urban Elements',
+    lbl_urb_life: 'Activity & People',
+    lbl_urb_rend: 'Rendering Style',
+    lbl_urb_scale: 'Scale & View',
+    lbl_prod_type: 'Product Type <span class="req">*</span>',
+    lbl_prod_style: 'Photography Style',
+    lbl_prod_mat: 'Product Material',
+    lbl_prod_color: 'Product Color',
+    lbl_prod_light: 'Lighting Setup',
+    lbl_prod_cam: 'Camera Angle',
+    lbl_prod_use: 'Image Purpose',
+    lbl_adv_ratio: 'Aspect Ratio',
+    lbl_adv_qual: 'Output Quality',
+    lbl_adv_txt: 'Text in Image (exact wording)',
+    lbl_adv_edit: 'Edit Delta (Edit intent only)',
+    lbl_adv_notes: 'Extra Notes / Constraints',
+    adv_btn_open: '+ Advanced Options',
+    adv_btn_close: '− Advanced Options',
+    gen_btn: '✦ Build Prompt',
+    reset_btn: '↺ Reset all',
+    copy_btn: 'Copy Prompt',
+    clear_btn: 'Clear',
+    regen_btn: 'Regenerate',
+    ophld: 'Choose your options and click ✦ Build Prompt',
+    lbl_user_desc_edit: 'What do you want to do? <span style="color:var(--tx3);font-weight:400;">(describe your edit — sidebar fields are optional)</span>',
+    lbl_user_desc_blend: 'What do you want to blend? <span style="color:var(--tx3);font-weight:400;">(describe the result — sidebar fields are optional)</span>',
+    lbl_user_desc_2d3d: 'Describe the transformation <span style="color:var(--tx3);font-weight:400;">(what to convert and preserve — sidebar optional)</span>',
+    user_desc_ph_edit: 'e.g. Change sofa color to emerald green, keep all other materials and lighting exactly the same...',
+    user_desc_ph_blend: 'e.g. Blend the style of Image 1 with the spatial layout of Image 2, apply to a living room...',
+    user_desc_ph_2d3d: 'e.g. Convert this floor plan sketch into a photorealistic 3D perspective view, keep same proportions...',
+    lbl_text_img: 'Exact text to render in the image <span style="color:var(--tx3);font-weight:400;">(type the words exactly)</span>',
+    text_img_ph: 'e.g. Interior Zone Academy · Project in 6 Hours',
+    tip: '<strong>Google\'s Golden Rule:</strong> Full descriptive sentences always outperform keyword lists. If the result is 80% right, switch to <em>Edit</em> intent and describe only the delta — don\'t regenerate from scratch. Reference images help Claude understand context and describe materials more precisely.',
+    intent_gen: 'Generate', intent_edit: 'Edit', intent_blend: 'Blend', intent_txt: 'Text in Image', intent_2d3d: '2D → 3D',
+    cat_int: 'Interior Design', cat_arch: 'Architecture', cat_urban: 'Urban Design', cat_prod: 'Product Design',
+  },
+  ar: {
+    hdr_sub: 'أدوات الذكاء الاصطناعي',
+    tool_lbl: 'نانو بنانا <span>منشئ البرومت</span>',
+    lang_btn: 'EN',
+    lbl_intent: 'النية',
+    lbl_cat: 'التخصص',
+    lbl_ref: 'صور المرجع',
+    lbl_ref_sub: 'ارفع حتى 15 صورة — تساعد على وصف أدق',
+    clear_imgs: 'مسح الكل',
+    upload_lbl: '<strong>اضغط للرفع</strong> أو اسحب وأفلت',
+    upload_hint: 'JPG · PNG · WEBP — أو الصق (Ctrl+V) — حد أقصى 15',
+    lbl_int_space: 'نوع المساحة <span class="req">*</span>',
+    lbl_int_style: 'الأسلوب والطابع <span class="req">*</span>',
+    lbl_int_pal: 'لوحة الألوان',
+    lbl_int_mat: 'الخامات الرئيسية',
+    lbl_int_light: 'الإضاءة والمود',
+    lbl_int_shot: 'زاوية التصوير',
+    lbl_int_lens: 'العدسة',
+    lbl_int_use: 'الغرض من الصورة',
+    lbl_int_furniture: 'الأثاث والعناصر',
+    lbl_int_furniture_hint: '(اختر اللي موجود في المكان)',
+    lbl_arch_bldg: 'نوع المبنى <span class="req">*</span>',
+    lbl_arch_style: 'الأسلوب المعماري <span class="req">*</span>',
+    lbl_arch_fac: 'خامة الواجهة',
+    lbl_arch_light: 'الوقت والإضاءة',
+    lbl_arch_ctx: 'الموقع والسياق',
+    lbl_arch_view: 'الفيو وزاوية التصوير',
+    lbl_arch_feat: 'مميزات خاصة',
+    lbl_urb_type: 'نوع المشروع الأوربان <span class="req">*</span>',
+    lbl_urb_char: 'طابع التصميم الأوربان',
+    lbl_urb_elem: 'عناصر الأوربان',
+    lbl_urb_life: 'الحياة والحركة',
+    lbl_urb_rend: 'أسلوب الرندر',
+    lbl_urb_scale: 'المقياس والفيو',
+    lbl_prod_type: 'نوع المنتج <span class="req">*</span>',
+    lbl_prod_style: 'أسلوب التصوير',
+    lbl_prod_mat: 'خامة المنتج',
+    lbl_prod_color: 'لون المنتج',
+    lbl_prod_light: 'الإضاءة',
+    lbl_prod_cam: 'زاوية الكاميرا',
+    lbl_prod_use: 'الغرض من الصورة',
+    lbl_adv_ratio: 'النسبة والاتجاه',
+    lbl_adv_qual: 'جودة الصورة',
+    lbl_adv_txt: 'نص داخل الصورة (بالظبط)',
+    lbl_adv_edit: 'التعديل المحدد (للإيديت فقط)',
+    lbl_adv_notes: 'ملاحظات وقيود إضافية',
+    adv_btn_open: '+ خيارات متقدمة',
+    adv_btn_close: '− خيارات متقدمة',
+    gen_btn: '✦ ابني البرومت',
+    reset_btn: '↺ إعادة الكل للصفر',
+    copy_btn: 'نسخ البرومت',
+    clear_btn: 'مسح',
+    regen_btn: 'أعد البناء',
+    ophld: 'اختر الخصائص واضغط ✦ ابني البرومت',
+    lbl_user_desc_edit: 'عايز تعمل إيه؟ <span style="color:var(--tx3);font-weight:400;">(صف التعديل — الخيارات التانية اختيارية)</span>',
+    lbl_user_desc_blend: 'عايز تدمج إيه؟ <span style="color:var(--tx3);font-weight:400;">(صف النتيجة المطلوبة — الخيارات اختيارية)</span>',
+    lbl_user_desc_2d3d: 'صف التحويل المطلوب <span style="color:var(--tx3);font-weight:400;">(إيه اللي هيتحول وإيه اللي هيتحفظ — اختياري)</span>',
+    user_desc_ph_edit: 'مثال: غير لون الكنبة لأخضر زمردي، خلي كل الخامات والإضاءة زي ما هي...',
+    user_desc_ph_blend: 'مثال: ادمج أسلوب الصورة 1 مع تخطيط الصورة 2، طبقها على صالة معيشة...',
+    user_desc_ph_2d3d: 'مثال: حول المسقط ده لبرسبكتيف 3D فوتوريالستيك مع الحفاظ على نفس النسب...',
+    lbl_text_img: 'النص المطلوب كتابته داخل الصورة <span style="color:var(--tx3);font-weight:400;">(اكتب الكلمات بالظبط)</span>',
+    text_img_ph: 'مثال: Interior Zone Academy · مشروع في 6 ساعات',
+    tip: '<strong>قاعدة جوجل الذهبية:</strong> الجملة الكاملة دايمًا أفضل من قائمة كيوردز. لو النتيجة 80% صح، استخدم نية <em>تعديل</em> وصف التغيير بس — ما تعيدش من الصفر. صور المرجع تساعد على وصف الخامات والسياق بدقة أعلى.',
+    intent_gen: 'توليد', intent_edit: 'تعديل', intent_blend: 'دمج', intent_txt: 'نص في صورة', intent_2d3d: '2D ← 3D',
+    cat_int: 'تصميم داخلي', cat_arch: 'عمارة', cat_urban: 'أوربان', cat_prod: 'تصميم منتج',
+  }
+};
+
+/* ═══════════ LANG TOGGLE ═══════════ */
+function toggleLang() {
+  L = L === 'en' ? 'ar' : 'en';
+  applyLang();
+}
+
+function applyLang() {
+  const t = T[L];
+  const isAr = L === 'ar';
+  document.documentElement.lang = L;
+  document.body.style.direction = isAr ? 'rtl' : 'ltr';
+  document.body.classList.toggle('en', !isAr);
+
+  document.getElementById('hdr-sub').textContent = t.hdr_sub;
+  document.getElementById('tool-lbl').innerHTML = t.tool_lbl;
+  document.getElementById('langBtn').textContent = t.lang_btn;
+  document.getElementById('lbl-intent').textContent = t.lbl_intent;
+  document.getElementById('lbl-cat').textContent = t.lbl_cat;
+  document.getElementById('lbl-ref').textContent = t.lbl_ref;
+  document.getElementById('lbl-ref-sub').textContent = t.lbl_ref_sub;
+  document.getElementById('clear-imgs-lbl').textContent = t.clear_imgs;
+  document.getElementById('upload-lbl-text').innerHTML = t.upload_lbl;
+  document.getElementById('upload-hint-text').textContent = t.upload_hint;
+
+  // field labels
+  const lbls = ['int-space','int-style','int-pal','int-mat','int-light','int-shot','int-lens','int-use',
+    'arch-bldg','arch-style','arch-fac','arch-light','arch-ctx','arch-view','arch-feat',
+    'urb-type','urb-char','urb-elem','urb-life','urb-rend','urb-scale',
+    'prod-type','prod-style','prod-mat','prod-color','prod-light','prod-cam','prod-use',
+    'adv-ratio','adv-qual','adv-txt','adv-edit','adv-notes'];
+  lbls.forEach(k => {
+    const el = document.getElementById('lbl-'+k);
+    if (el) el.innerHTML = t['lbl_'+k.replace(/-/g,'_')];
+  });
+
+  // intent pills
+  const imap = {GENERATE:'gen',EDIT:'edit',BLEND:'blend',TEXT:'txt','2D3D':'2d3d'};
+  document.querySelectorAll('.ipill').forEach(p => {
+    const k = imap[p.dataset.intent];
+    if (k && t['intent_'+k]) p.textContent = t['intent_'+k];
+  });
+
+  // category pills
+  const cmap = {int:'int',arch:'arch',urban:'urban',prod:'prod'};
+  document.querySelectorAll('.cpill').forEach(p => {
+    const k = cmap[p.dataset.cat];
+    if (k && t['cat_'+k]) p.textContent = t['cat_'+k];
+  });
+
+  // buttons
+  document.getElementById('genBtn').textContent = t.gen_btn;
+  document.getElementById('resetBtn').textContent = t.reset_btn;
+  document.getElementById('clearBtn').textContent = t.clear_btn;
+  document.getElementById('copyBtn').textContent = t.copy_btn;
+  document.getElementById('copyBtn2').textContent = t.copy_btn;
+  document.getElementById('regenBtn').textContent = t.regen_btn;
+  document.getElementById('ophld').textContent = t.ophld;
+
+  // adv button
+  const advSec = document.getElementById('advSec');
+  document.getElementById('advBtn').textContent = advSec.classList.contains('open') ? t.adv_btn_close : t.adv_btn_open;
+
+  // select arrow side
+  document.querySelectorAll('select').forEach(s => {
+    s.style.backgroundPosition = isAr ? 'left 9px center' : 'right 9px center';
+    s.style.paddingLeft = isAr ? '26px' : '10px';
+    s.style.paddingRight = isAr ? '10px' : '26px';
+  });
+
+  // sidebar border side
+  const sb = document.getElementById('sidebar');
+  if (isAr) { sb.style.borderLeft='1px solid var(--br)'; sb.style.borderRight='none'; }
+  else { sb.style.borderRight='1px solid var(--br)'; sb.style.borderLeft='none'; }
+
+  // furniture label + hint
+  const fl = document.getElementById('lbl-int-furniture');
+  if (fl) fl.childNodes[0].nodeValue = t.lbl_int_furniture + ' ';
+  const fh = document.getElementById('lbl-int-furniture-hint');
+  if (fh) fh.textContent = t.lbl_int_furniture_hint;
+  // re-label dynamic furniture tags to the active language
+  document.querySelectorAll('#int-furniture .tag').forEach(tg => {
+    if (tg.dataset.en && tg.dataset.ar) tg.textContent = isAr ? tg.dataset.ar : tg.dataset.en;
+  });
+
+  // update intent-dependent desc box labels
+  updateIntentUI();
+}
+
+/* ═══════════ MODEL ═══════════ */
+function selModel(btn) {
+  document.querySelectorAll('.mbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  model = btn.dataset.m;
+}
+
+/* ═══════════ INTENT ═══════════ */
+function selIntent(btn) {
+  document.querySelectorAll('.ipill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  intent = btn.dataset.intent;
+  document.getElementById('intentLabel').textContent = intent;
+  updateIntentUI();
+}
+
+function updateIntentUI() {
+  const t = T[L];
+  const wrap = document.getElementById('user-desc-wrap');
+  const lbl  = document.getElementById('lbl-user-desc');
+  const ta   = document.getElementById('user-desc');
+  const txtWrap = document.getElementById('text-img-wrap');
+  const txtLbl  = document.getElementById('lbl-text-img');
+  const txtInput = document.getElementById('text-img-input');
+  const isImgIntent = ['EDIT','BLEND','2D3D'].includes(intent);
+
+  wrap.style.display = isImgIntent ? 'block' : 'none';
+  txtWrap.style.display = (intent === 'TEXT') ? 'block' : 'none';
+
+  // Localize the text-in-image box
+  txtLbl.innerHTML = t.lbl_text_img;
+  txtInput.placeholder = t.text_img_ph;
+
+  if (intent === 'EDIT') {
+    lbl.innerHTML = t.lbl_user_desc_edit;
+    ta.placeholder = t.user_desc_ph_edit;
+  } else if (intent === 'BLEND') {
+    lbl.innerHTML = t.lbl_user_desc_blend;
+    ta.placeholder = t.user_desc_ph_blend;
+  } else if (intent === '2D3D') {
+    lbl.innerHTML = t.lbl_user_desc_2d3d;
+    ta.placeholder = t.user_desc_ph_2d3d;
+  }
+}
+
+/* ═══════════ CATEGORY ═══════════ */
+function selCat(btn) {
+  document.querySelectorAll('.cpill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  cat = btn.dataset.cat;
+  document.querySelectorAll('.cpanel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+cat).classList.add('active');
+}
+
+/* ═══════════ TAGS ═══════════ */
+function tog(el) { el.classList.toggle('sel'); }
+function getTags(id) {
+  return Array.from(document.querySelectorAll('#'+id+' .tag.sel')).map(t => t.dataset.val);
+}
+
+/* ═══════════ FURNITURE BY ROOM ═══════════ */
+/* Each item: [prompt-value, EN label, AR label]. Shown when matching space is selected. */
+const FURNITURE = {
+  "a luxury master bedroom suite": [
+    ["a king-size upholstered bed","King Bed","سرير كينج"],["an upholstered headboard","Headboard","هيدبورد"],
+    ["a pair of bedside nightstands","Nightstands","كومودينو"],["a bedroom bench at the foot of the bed","Bed Bench","بنش السرير"],
+    ["a chaise lounge","Chaise Lounge","شيز لونج"],["a vanity dressing table","Vanity Table","تسريحة"],
+    ["a tall wardrobe","Wardrobe","دولاب"],["a seating armchair","Armchair","كرسي"],
+    ["a TV media console","TV Console","وحدة تلفزيون"],["a full-length mirror","Floor Mirror","مراية قائمة"],
+    ["a ceiling chandelier","Chandelier","نجفة"],["an area rug","Area Rug","سجادة"]
+  ],
+  "a children's bedroom": [
+    ["a single kids bed","Kids Bed","سرير أطفال"],["a bunk bed","Bunk Bed","سرير دورين"],
+    ["a study desk and chair","Study Desk","مكتب مذاكرة"],["a toy storage unit","Toy Storage","وحدة ألعاب"],
+    ["a bookshelf","Bookshelf","رف كتب"],["a play rug","Play Rug","سجادة لعب"],
+    ["a wardrobe","Wardrobe","دولاب"],["a reading nook","Reading Nook","ركن قراءة"]
+  ],
+  "a teenage bedroom": [
+    ["a single bed","Bed","سرير"],["a study and gaming desk","Gaming Desk","مكتب جيمنج"],
+    ["a gaming chair","Gaming Chair","كرسي جيمنج"],["a wardrobe","Wardrobe","دولاب"],
+    ["a bookshelf","Bookshelf","رف كتب"],["a TV or monitor wall","Screen Wall","حائط شاشة"],
+    ["a bean bag","Bean Bag","بين باج"],["a wall shelf display","Wall Shelves","أرفف حائط"]
+  ],
+  "a guest bedroom": [
+    ["a queen bed","Queen Bed","سرير كوين"],["nightstands","Nightstands","كومودينو"],
+    ["an accent armchair","Armchair","كرسي"],["a wardrobe","Wardrobe","دولاب"],
+    ["a luggage bench","Luggage Bench","بنش شنط"],["an area rug","Area Rug","سجادة"]
+  ],
+  "a nursery and baby room": [
+    ["a baby crib","Crib","سرير بيبي"],["a changing table","Changing Table","طاولة تغيير"],
+    ["a nursing armchair","Nursing Chair","كرسي رضاعة"],["a storage dresser","Dresser","دولاب أدراج"],
+    ["a toy shelf","Toy Shelf","رف ألعاب"],["a soft play rug","Play Rug","سجادة"]
+  ],
+  "a spacious modern living room": [
+    ["a large sofa","Sofa","كنبة"],["an L-shaped sectional sofa","L-Shape Sectional","كنبة L"],
+    ["a pair of accent armchairs","Accent Chairs","كراسي"],["a coffee table","Coffee Table","ترابيزة قهوة"],
+    ["a TV media unit","TV Unit","وحدة تلفزيون"],["a console table","Console Table","كونسول"],
+    ["side tables","Side Tables","ترابيزات جانبية"],["a bookshelf","Bookshelf","مكتبة"],
+    ["an area rug","Area Rug","سجادة"],["a floor lamp","Floor Lamp","أباجورة أرضية"],
+    ["a coffee corner station","Coffee Corner","ركن قهوة"],["indoor plants","Plants","نباتات"],
+    ["a ceiling chandelier","Chandelier","نجفة"],["wall art","Wall Art","لوحات"]
+  ],
+  "an open-plan kitchen and dining area": [
+    ["a kitchen island with seating","Kitchen Island","جزيرة مطبخ"],["upper and lower cabinets","Cabinets","دواليب مطبخ"],
+    ["bar stools","Bar Stools","كراسي بار"],["a dining table","Dining Table","سفرة"],
+    ["dining chairs","Dining Chairs","كراسي سفرة"],["a pendant light over island","Pendant Lights","إضاءة معلقة"],
+    ["a built-in oven and hood","Oven & Hood","فرن وشفاط"],["open shelving","Open Shelves","أرفف مفتوحة"],
+    ["a sideboard buffet","Sideboard","بوفيه"],["a tall fridge","Fridge","تلاجة"]
+  ],
+  "a dining room": [
+    ["a dining table","Dining Table","سفرة"],["dining chairs","Dining Chairs","كراسي سفرة"],
+    ["a sideboard buffet","Sideboard","بوفيه"],["a display cabinet","Display Cabinet","نيش"],
+    ["a statement chandelier","Chandelier","نجفة"],["a console table","Console","كونسول"],
+    ["an area rug","Area Rug","سجادة"],["a wall mirror","Wall Mirror","مراية"]
+  ],
+  "a dedicated home office workspace": [
+    ["an executive desk","Desk","مكتب"],["an ergonomic office chair","Office Chair","كرسي مكتب"],
+    ["bookshelves","Bookshelves","مكتبة"],["a filing storage cabinet","Storage Cabinet","دولاب ملفات"],
+    ["a guest chair","Guest Chair","كرسي ضيف"],["a desk lamp","Desk Lamp","أباجورة مكتب"],
+    ["a pinboard or whiteboard","Board","بورد"],["an accent armchair","Armchair","كرسي"]
+  ],
+  "a luxury walk-in closet and dressing room": [
+    ["open hanging wardrobe systems","Wardrobe Systems","أنظمة تعليق"],["a central island with drawers","Closet Island","جزيرة أدراج"],
+    ["a dressing vanity","Vanity","تسريحة"],["a seating ottoman","Ottoman","بوف"],
+    ["a full-length mirror","Floor Mirror","مراية قائمة"],["shoe display shelves","Shoe Shelves","أرفف أحذية"],
+    ["glass display cabinets","Display Cabinets","فاترين"],["accent lighting","Accent Lighting","إضاءة"]
+  ],
+  "a luxury en-suite bathroom with spa elements": [
+    ["a freestanding bathtub","Bathtub","بانيو"],["a walk-in shower","Shower","شاور"],
+    ["a double vanity","Double Vanity","حوض مزدوج"],["a vanity mirror","Mirror","مراية"],
+    ["a toilet","Toilet","تواليت"],["towel storage","Towel Storage","تخزين فوط"],
+    ["a seating bench","Bench","بنش"],["plants and spa decor","Spa Decor","ديكور سبا"]
+  ],
+  "a home cinema and media room": [
+    ["tiered recliner seating","Recliner Seats","كراسي سينما"],["a large projection screen","Screen","شاشة"],
+    ["a media console","Media Console","وحدة ميديا"],["acoustic wall panels","Acoustic Panels","عزل صوتي"],
+    ["a bar counter","Bar Counter","بار"],["LED cove lighting","Cove Lighting","إضاءة مخفية"],
+    ["a snack station","Snack Station","ركن سناكس"]
+  ],
+  "a private home library and reading room": [
+    ["floor-to-ceiling bookshelves","Bookshelves","مكتبة"],["a reading armchair","Reading Chair","كرسي قراءة"],
+    ["a chesterfield sofa","Chesterfield Sofa","كنبة تشيسترفيلد"],["a library ladder","Library Ladder","سلم مكتبة"],
+    ["a writing desk","Writing Desk","مكتب"],["a floor lamp","Floor Lamp","أباجورة"],
+    ["a side table","Side Table","ترابيزة جانبية"],["an area rug","Area Rug","سجادة"]
+  ],
+  "a private gym and wellness room": [
+    ["cardio equipment","Cardio Equipment","أجهزة كارديو"],["weight racks and dumbbells","Weights","أوزان"],
+    ["a mirror wall","Mirror Wall","حائط مرايات"],["rubber flooring","Rubber Floor","أرضية مطاط"],
+    ["a yoga and stretching mat area","Yoga Area","ركن يوجا"],["a TV screen","TV Screen","شاشة"],
+    ["storage shelving","Storage","تخزين"],["a water station","Water Station","ركن مياه"]
+  ],
+  "a grand entrance foyer and reception hall": [
+    ["a console table","Console Table","كونسول"],["a statement mirror","Statement Mirror","مراية"],
+    ["a central round table","Center Table","ترابيزة وسط"],["a seating bench","Bench","بنش"],
+    ["a coat and shoe storage","Coat Storage","دولاب مدخل"],["a grand chandelier","Chandelier","نجفة"],
+    ["a large area rug","Area Rug","سجادة"],["decorative plants","Plants","نباتات"]
+  ],
+  "a grand luxury hotel lobby": [
+    ["a reception desk","Reception Desk","ريسبشن"],["lounge seating clusters","Lounge Seating","جلسات لاونج"],
+    ["a statement chandelier","Chandelier","نجفة"],["a central feature installation","Feature Piece","قطعة محورية"],
+    ["coffee tables","Coffee Tables","ترابيزات"],["a concierge desk","Concierge","كونسيرج"],
+    ["large planters","Planters","أحواض نبات"],["a waiting sofa area","Waiting Area","انتظار"]
+  ],
+  "a boutique hotel suite": [
+    ["a king bed","King Bed","سرير كينج"],["a lounge sofa","Sofa","كنبة"],
+    ["a work desk","Desk","مكتب"],["an armchair and side table","Armchair","كرسي"],
+    ["a minibar console","Minibar","ميني بار"],["a TV unit","TV Unit","وحدة تلفزيون"],
+    ["a luggage bench","Luggage Bench","بنش شنط"]
+  ],
+  "a fine dining restaurant interior": [
+    ["dining tables","Dining Tables","ترابيزات"],["dining chairs and banquettes","Chairs & Banquettes","كراسي وبنشات"],
+    ["a host stand","Host Stand","استقبال"],["a bar counter","Bar","بار"],
+    ["statement lighting","Statement Lighting","إضاءة مميزة"],["a wine display","Wine Display","عرض نبيذ"],
+    ["a partition screen","Partition","فاصل"],["banquette booths","Booths","بوكسات"]
+  ],
+  "a casual café and coffee shop interior": [
+    ["a coffee bar counter","Coffee Bar","بار قهوة"],["café tables","Café Tables","ترابيزات"],
+    ["mixed seating chairs","Chairs","كراسي"],["a communal table","Communal Table","ترابيزة مشتركة"],
+    ["bar stools","Bar Stools","كراسي بار"],["a pastry display","Pastry Display","عرض حلويات"],
+    ["pendant lighting","Pendants","إضاءة معلقة"],["a lounge corner","Lounge Corner","ركن لاونج"]
+  ],
+  "a modern corporate office open workspace": [
+    ["workstation desks","Workstations","مكاتب عمل"],["ergonomic task chairs","Task Chairs","كراسي"],
+    ["meeting pods","Meeting Pods","غرف اجتماعات"],["lounge breakout seating","Breakout Seating","جلسات"],
+    ["storage lockers","Lockers","لوكرز"],["a reception desk","Reception","ريسبشن"],
+    ["acoustic panels","Acoustic Panels","عزل صوتي"],["a pantry counter","Pantry","بانتري"]
+  ],
+  "a CEO executive office": [
+    ["an executive desk","Executive Desk","مكتب مدير"],["an executive leather chair","Executive Chair","كرسي مدير"],
+    ["guest chairs","Guest Chairs","كراسي ضيوف"],["a meeting table","Meeting Table","ترابيزة اجتماعات"],
+    ["a lounge sofa","Sofa","كنبة"],["bookshelves","Bookshelves","مكتبة"],
+    ["a credenza storage","Credenza","كردنزة"],["a bar cabinet","Bar Cabinet","بار"]
+  ],
+  "a high-end retail showroom": [
+    ["product display units","Display Units","وحدات عرض"],["wall display shelving","Wall Shelves","أرفف حائط"],
+    ["a cash counter","Cash Counter","كاشير"],["display mannequins or stands","Display Stands","استاندات"],
+    ["seating benches","Benches","بنشات"],["accent spotlights","Spotlights","سبوت"],
+    ["a feature display table","Feature Table","ترابيزة عرض"]
+  ],
+  "a luxury spa and wellness center interior": [
+    ["treatment beds","Treatment Beds","أسرة علاج"],["a reception desk","Reception","ريسبشن"],
+    ["a relaxation lounge","Relaxation Lounge","صالة استرخاء"],["a water feature","Water Feature","نافورة"],
+    ["product display shelves","Product Shelves","أرفف منتجات"],["soft loungers","Loungers","كراسي استرخاء"],
+    ["planters and greenery","Greenery","نباتات"]
+  ]
+};
+
+const FURNITURE_DEFAULT = [
+  ["a sofa","Sofa","كنبة"],["armchairs","Armchairs","كراسي"],["a coffee table","Coffee Table","ترابيزة"],
+  ["storage units","Storage","تخزين"],["a desk","Desk","مكتب"],["shelving","Shelving","أرفف"],
+  ["a rug","Rug","سجادة"],["lighting fixtures","Lighting","إضاءة"],["wall art","Wall Art","لوحات"],["plants","Plants","نباتات"]
+];
+
+function populateFurniture() {
+  const space = document.getElementById('int-space').value;
+  const wrap = document.getElementById('int-furniture-wrap');
+  const grid = document.getElementById('int-furniture');
+  if (!space) { wrap.style.display = 'none'; grid.innerHTML = ''; return; }
+
+  const items = FURNITURE[space] || FURNITURE_DEFAULT;
+  grid.innerHTML = '';
+  items.forEach(([val, en, ar]) => {
+    const d = document.createElement('div');
+    d.className = 'tag';
+    d.dataset.val = val;
+    d.dataset.en = en;
+    d.dataset.ar = ar;
+    d.textContent = (L === 'ar') ? ar : en;
+    d.onclick = () => tog(d);
+    grid.appendChild(d);
+  });
+  wrap.style.display = 'block';
+}
+
+/* ═══════════ ADVANCED ═══════════ */
+function toggleAdv() {
+  const s = document.getElementById('advSec');
+  s.classList.toggle('open');
+  const t = T[L];
+  document.getElementById('advBtn').textContent = s.classList.contains('open') ? t.adv_btn_close : t.adv_btn_open;
+}
+
+/* ═══════════ IMAGE UPLOAD ═══════════ */
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+
+/* ── Paste from clipboard (Ctrl+V / Cmd+V) — screenshots or copied images ── */
+document.addEventListener('paste', e => {
+  // Ignore paste when the user is typing into a text field (so they can paste text normally)
+  const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+  if (tag === 'input' || tag === 'textarea') return;
+
+  const items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : [];
+  const imageFiles = [];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type && items[i].type.indexOf('image') === 0) {
+      const f = items[i].getAsFile();
+      if (f) imageFiles.push(f);
+    }
+  }
+  if (imageFiles.length > 0) {
+    e.preventDefault();
+    handleFiles(imageFiles);
+    // brief visual confirmation on the upload zone
+    zone.classList.add('drag');
+    setTimeout(() => zone.classList.remove('drag'), 400);
+  }
+});
+
+function handleFiles(files) {
+  const remaining = 15 - uploadedImages.length;
+  const toProcess = Math.min(files.length, remaining);
+  if (toProcess === 0) return;
+  let processed = 0;
+  const done = () => { processed++; if (processed === toProcess) renderImages(); };
+
+  for (let i = 0; i < toProcess; i++) {
+    const file = files[i];
+    if (!file.type.startsWith('image/')) { done(); continue; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Resize to max 1024px on longest side, compress to JPEG 0.72
+        // Keeps each image small so 15 images stay within total request limits
+        const MAX = 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.72);
+        uploadedImages.push({ dataUrl: compressed, name: file.name });
+        done();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function renderImages() {
+  const grid = document.getElementById('imgsGrid');
+  const badge = document.getElementById('imgCountBadge');
+  const clearBtn = document.getElementById('clear-imgs-lbl');
+  const zone = document.getElementById('uploadZone');
+  grid.innerHTML = '';
+  uploadedImages.forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = 'img-thumb';
+    div.innerHTML = `<img src="${img.dataUrl}" alt="ref ${i+1}">
+      <button class="img-remove" onclick="removeImg(${i})">✕</button>
+      <div class="img-role-badge">Ref ${i+1}</div>`;
+    grid.appendChild(div);
+  });
+  const n = uploadedImages.length;
+  badge.textContent = n > 0 ? `${n}/15 uploaded` : '';
+  clearBtn.style.display = n > 0 ? 'block' : 'none';
+  zone.style.display = n >= 15 ? 'none' : 'block';
+  document.getElementById('fileInput').value = '';
+}
+
+function removeImg(i) {
+  uploadedImages.splice(i, 1);
+  renderImages();
+}
+
+function clearAllImgs() {
+  uploadedImages = [];
+  renderImages();
+}
+
+/* ═══════════ CLEAR OUTPUT ═══════════ */
+function clearAll() {
+  document.getElementById('oprmt').style.display = 'none';
+  document.getElementById('ophld').style.display = 'block';
+  document.getElementById('ofoot').style.display = 'none';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('charCount').textContent = '0 / 1000';
+  document.getElementById('charCount').className = 'ccount';
+  document.getElementById('cbarF').style.width = '0%';
+  document.getElementById('cbarF').style.background = 'var(--ac)';
+}
+
+/* ═══════════ RESET ALL — full reset to defaults ═══════════ */
+function resetAll() {
+  // 1. Reset every <select> to its first option
+  document.querySelectorAll('.sidebar select').forEach(s => { s.selectedIndex = 0; });
+
+  // 2. Deselect every tag (palette, materials, facade, features, urban, furniture, etc.)
+  document.querySelectorAll('.sidebar .tag.sel').forEach(t => t.classList.remove('sel'));
+
+  // 3. Clear all text inputs and textareas
+  document.querySelectorAll('.sidebar input[type=text], .sidebar textarea').forEach(el => { el.value = ''; });
+
+  // 4. Clear uploaded reference images
+  uploadedImages = [];
+  renderImages();
+
+  // 5. Reset intent → GENERATE
+  document.querySelectorAll('.ipill').forEach(p => p.classList.remove('active'));
+  const genPill = document.querySelector('.ipill[data-intent="GENERATE"]');
+  if (genPill) genPill.classList.add('active');
+  intent = 'GENERATE';
+  document.getElementById('intentLabel').textContent = 'GENERATE';
+
+  // 6. Reset category → Interior Design
+  document.querySelectorAll('.cpill').forEach(p => p.classList.remove('active'));
+  const intPill = document.querySelector('.cpill[data-cat="int"]');
+  if (intPill) intPill.classList.add('active');
+  cat = 'int';
+  document.querySelectorAll('.cpanel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-int').classList.add('active');
+
+  // 7. Hide dynamic furniture + collapse advanced section
+  const furnWrap = document.getElementById('int-furniture-wrap');
+  if (furnWrap) { furnWrap.style.display = 'none'; document.getElementById('int-furniture').innerHTML = ''; }
+  const adv = document.getElementById('advSec');
+  if (adv && adv.classList.contains('open')) toggleAdv();
+
+  // 8. Update intent-dependent boxes (hides desc/text boxes) + clear output
+  updateIntentUI();
+  clearAll();
+
+  // 9. Scroll sidebar back to top
+  document.getElementById('sidebar').scrollTop = 0;
+}
+
+/* ═══════════ CHAR COUNT ═══════════ */
+function updateCC(txt) {
+  const n = txt.length;
+  const el = document.getElementById('charCount');
+  const bar = document.getElementById('cbarF');
+  el.textContent = n + ' / 1000';
+  const pct = Math.min((n/1000)*100, 100);
+  bar.style.width = pct + '%';
+  if (n <= 850) { el.className='ccount ok'; bar.style.background='var(--gr)'; }
+  else if (n <= 1000) { el.className='ccount warn'; bar.style.background='#f59e0b'; }
+  else { el.className='ccount over'; bar.style.background='var(--rd)'; }
+}
+
+/* ═══════════ COPY ═══════════ */
+function copyPrmt() {
+  const txt = document.getElementById('oprmt').textContent;
+  if (!txt) return;
+
+  const flash = (label, ok) => {
+    ['copyBtn','copyBtn2'].forEach(id => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.textContent = label;
+      b.classList.toggle('copied', ok);
+      setTimeout(() => { b.textContent = T[L].copy_btn; b.classList.remove('copied'); }, 2000);
+    });
+  };
+
+  // Fallback copy using a temporary textarea + execCommand (works on file:// and http)
+  const fallbackCopy = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.left = '-9999px';
+      ta.setAttribute('readonly', '');
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, txt.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      flash(ok ? '✓ Copied!' : '⚠ Press Ctrl+C', ok);
+    } catch (e) {
+      flash('⚠ Select & Ctrl+C', false);
+    }
+  };
+
+  // Try the modern clipboard API first; if unavailable or blocked, fall back
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt)
+      .then(() => flash('✓ Copied!', true))
+      .catch(() => fallbackCopy());
+  } else {
+    fallbackCopy();
+  }
+}
+
+/* ═══════════ GATHER DATA ═══════════ */
+function gather() {
+  const d = {
+    intent, cat, model,
+    ratio: document.getElementById('adv-ratio').value,
+    qual: document.getElementById('adv-qual').value,
+    txt: (document.getElementById('text-img-input').value.trim() || document.getElementById('adv-txt').value.trim()),
+    edit: document.getElementById('adv-edit').value.trim(),
+    notes: document.getElementById('adv-notes').value.trim(),
+    userDesc: document.getElementById('user-desc').value.trim(),
+    hasImages: uploadedImages.length > 0,
+    imageCount: uploadedImages.length,
+  };
+  if (cat==='int') {
+    d.space = document.getElementById('int-space').value;
+    d.style = document.getElementById('int-style').value;
+    d.pal = getTags('int-pal');
+    d.mat = getTags('int-mat');
+    d.furniture = getTags('int-furniture');
+    d.light = document.getElementById('int-light').value;
+    d.shot = document.getElementById('int-shot').value;
+    d.lens = document.getElementById('int-lens').value;
+    d.use = document.getElementById('int-use').value;
+  } else if (cat==='arch') {
+    d.bldg = document.getElementById('arch-bldg').value;
+    d.style = document.getElementById('arch-style').value;
+    d.fac = getTags('arch-fac');
+    d.light = document.getElementById('arch-light').value;
+    d.ctx = document.getElementById('arch-ctx').value;
+    d.view = document.getElementById('arch-view').value;
+    d.feat = getTags('arch-feat');
+  } else if (cat==='urban') {
+    d.utype = document.getElementById('urb-type').value;
+    d.uchar = document.getElementById('urb-char').value;
+    d.uelem = getTags('urb-elem');
+    d.ulife = document.getElementById('urb-life').value;
+    d.urend = document.getElementById('urb-rend').value;
+    d.uscale = document.getElementById('urb-scale').value;
+  } else if (cat==='prod') {
+    d.ptype = document.getElementById('prod-type').value;
+    d.pstyle = document.getElementById('prod-style').value;
+    d.pmat = document.getElementById('prod-mat').value;
+    d.pcolor = document.getElementById('prod-color').value;
+    d.plight = document.getElementById('prod-light').value;
+    d.pcam = document.getElementById('prod-cam').value;
+    d.puse = document.getElementById('prod-use').value;
+  }
+  return d;
+}
+
+/* ═══════════ BUILD PROMPT ═══════════ */
+async function buildPrompt() {
+  const d = gather();
+  const isImgIntent = ['EDIT','BLEND','2D3D'].includes(d.intent);
+
+  // ── Validation: GENERATE/TEXT need the main type field (unless images provided) ──
+  if (!isImgIntent && !d.hasImages) {
+    let missingType = false;
+    if (d.cat === 'int'   && !d.space) missingType = true;
+    if (d.cat === 'arch'  && !d.bldg)  missingType = true;
+    if (d.cat === 'urban' && !d.utype) missingType = true;
+    if (d.cat === 'prod'  && !d.ptype) missingType = true;
+    if (missingType) {
+      const warnMsg = L === 'ar'
+        ? '⚠ اختر النوع الأساسي (المعلّم بـ *) أو ارفع صورة مرجعية أولاً.'
+        : '⚠ Please select the main type (marked *) or upload a reference image first.';
+      document.getElementById('ophld').style.display = 'none';
+      document.getElementById('oprmt').style.display = 'block';
+      document.getElementById('oprmt').textContent = warnMsg;
+      document.getElementById('ofoot').style.display = 'none';
+      document.getElementById('copyBtn').style.display = 'none';
+              return;
+    }
+  }
+  // ── Validation: image intents need either images or a description ──
+  if (isImgIntent && !d.hasImages && !d.userDesc) {
+    const warnMsg = L === 'ar'
+      ? '⚠ ارفع صورة واحدة على الأقل أو اكتب وصف التعديل المطلوب.'
+      : '⚠ Upload at least one image or describe what you want to do.';
+    document.getElementById('ophld').style.display = 'none';
+    document.getElementById('oprmt').style.display = 'block';
+    document.getElementById('oprmt').textContent = warnMsg;
+    document.getElementById('ofoot').style.display = 'none';
+    document.getElementById('copyBtn').style.display = 'none';
+        return;
+  }
+
+  // Disable buttons during request to prevent double-submit
+  const genBtn = document.getElementById('genBtn');
+  const regenBtn = document.getElementById('regenBtn');
+  genBtn.disabled = true; regenBtn.disabled = true;
+  genBtn.style.opacity = '0.6'; genBtn.style.cursor = 'wait';
+
+  document.getElementById('ophld').style.display = 'none';
+  document.getElementById('oprmt').style.display = 'none';
+  document.getElementById('ofoot').style.display = 'none';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('ldots').classList.add('on');
+
+  const sys = `You are a Nano Banana Pro Prompt Builder. Write paste-ready image generation prompts.
+
+OUTPUT FORMAT — return ONLY this exact JSON structure, nothing else before or after:
+{"prompt":"YOUR_PROMPT_HERE"}
+
+RULES FOR THE PROMPT FIELD:
+- One flowing descriptive English paragraph only
+- Hard limit: maximum 1000 characters — trim if needed
+- No labels (TASK/SUBJECT/LIGHTING/STYLE/CAMERA) — weave as natural prose
+- No line breaks, no markdown, no bullets inside the prompt string
+- Weave naturally: subject + materials/textures + composition + camera (focal length + aperture) + lighting (time, color temp, direction) + style + purpose + ratio + quality
+- End with: No watermark, no extra text, no conflicting styles. ${d.ratio}, ${d.qual}.
+- EDIT intent: open with "Edit the attached image by..." + state what MUST remain unchanged
+- BLEND intent: describe each reference image role naturally ("using Image 1 as... Image 2 as...")
+- 2D3D intent: state source format, target format, what to preserve
+- TEXT intent: wrap exact text in double quotes + add correction loop sentence
+
+REFERENCE IMAGES: ${d.hasImages ? d.imageCount + ' image(s) attached. Reference them naturally in the prompt.' : 'None attached.'}
+Model: ${d.model}
+
+CRITICAL: Your entire response must be parseable JSON with a single "prompt" key. Do not add any text outside the JSON object.`;
+
+  let msg = `Intent: ${d.intent} | Category: ${d.cat}\n`;
+  if (d.userDesc) msg += `User instruction: ${d.userDesc}\n`;
+  if (d.cat==='int' && !isImgIntent) {
+    if(d.space) msg+=`Space: ${d.space}\n`;
+    if(d.style) msg+=`Style: ${d.style}\n`;
+    if(d.furniture?.length) msg+=`Furniture and elements in the space: ${d.furniture.join(', ')}\n`;
+    if(d.pal?.length) msg+=`Palette: ${d.pal.join(', ')}\n`;
+    if(d.mat?.length) msg+=`Materials: ${d.mat.join(', ')}\n`;
+    if(d.light) msg+=`Lighting: ${d.light}\n`;
+    if(d.shot) msg+=`Shot: ${d.shot}\n`;
+    if(d.lens) msg+=`Lens: ${d.lens}\n`;
+    if(d.use) msg+=`Purpose: ${d.use}\n`;
+  } else if (d.cat==='int' && isImgIntent) {
+    if(d.space) msg+=`Space context (optional): ${d.space}\n`;
+    if(d.style) msg+=`Style direction (optional): ${d.style}\n`;
+    if(d.furniture?.length) msg+=`Furniture and elements: ${d.furniture.join(', ')}\n`;
+    if(d.pal?.length) msg+=`Palette direction: ${d.pal.join(', ')}\n`;
+    if(d.mat?.length) msg+=`Material direction: ${d.mat.join(', ')}\n`;
+    if(d.light) msg+=`Lighting direction: ${d.light}\n`;
+  } else if (d.cat==='arch') {
+    if(!isImgIntent && d.bldg) msg+=`Building: ${d.bldg}\n`;
+    if(!isImgIntent && d.style) msg+=`Style: ${d.style}\n`;
+    if(d.fac?.length) msg+=`Facade: ${d.fac.join(', ')}\n`;
+    if(d.light) msg+=`Time/Light: ${d.light}\n`;
+    if(!isImgIntent && d.ctx) msg+=`Context: ${d.ctx}\n`;
+    if(d.view) msg+=`View: ${d.view}\n`;
+    if(d.feat?.length) msg+=`Features: ${d.feat.join(', ')}\n`;
+  } else if (d.cat==='urban') {
+    if(!isImgIntent && d.utype) msg+=`Project: ${d.utype}\n`;
+    if(!isImgIntent && d.uchar) msg+=`Character: ${d.uchar}\n`;
+    if(d.uelem?.length) msg+=`Elements: ${d.uelem.join(', ')}\n`;
+    if(d.ulife) msg+=`Activity: ${d.ulife}\n`;
+    if(d.urend) msg+=`Render: ${d.urend}\n`;
+    if(d.uscale) msg+=`View: ${d.uscale}\n`;
+  } else if (d.cat==='prod') {
+    if(!isImgIntent && d.ptype) msg+=`Product: ${d.ptype}\n`;
+    if(d.pstyle) msg+=`Photo style: ${d.pstyle}\n`;
+    if(d.pmat) msg+=`Material: ${d.pmat}\n`;
+    if(d.pcolor) msg+=`Color: ${d.pcolor}\n`;
+    if(d.plight) msg+=`Lighting: ${d.plight}\n`;
+    if(d.pcam) msg+=`Camera: ${d.pcam}\n`;
+    if(d.puse) msg+=`Purpose: ${d.puse}\n`;
+  }
+  msg+=`Ratio: ${d.ratio} | Quality: ${d.qual}\n`;
+  if(d.txt) msg+=`Text in image: "${d.txt}"\n`;
+  if(d.edit) msg+=`Edit delta: ${d.edit}\n`;
+  if(d.notes) msg+=`Extra: ${d.notes}\n`;
+  if(isImgIntent && !d.hasImages) msg+=`Note: No images uploaded — build prompt describing the transformation intent anyway.\n`;
+
+  // Build API message with images
+  let msgContent;
+  if (uploadedImages.length > 0) {
+    msgContent = uploadedImages.map(img => {
+      const mimeMatch = img.dataUrl.match(/data:([^;]+);/);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+      const base64 = img.dataUrl.split(',')[1];
+      return { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } };
+    });
+    msgContent.push({ type: 'text', text: msg });
+  } else {
+    msgContent = msg;
+  }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: sys,
+        messages: [{ role: 'user', content: msgContent }]
+      })
+    });
+
+    const data = await res.json();
+
+    // If API returned an error object, show it clearly
+    if (data.error) {
+      throw new Error(`API Error (${data.error.type}): ${data.error.message}`);
+    }
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${JSON.stringify(data).slice(0,300)}`);
+    }
+
+    // Robust extraction — handle any wrapper text
+    const rawText = data.content?.find(c => c.type==='text')?.text || '';
+    if (!rawText) throw new Error('Empty response from API. Full response: ' + JSON.stringify(data).slice(0,300));
+
+    let parsed = null;
+    // Try 1: direct parse after stripping markdown fences
+    try { parsed = JSON.parse(rawText.replace(/```json\s*|\s*```/g,'').trim()); } catch(_) {}
+    // Try 2: extract first {...} block containing "prompt"
+    if (!parsed) {
+      const m = rawText.match(/\{[\s\S]*?"prompt"[\s\S]*?\}/);
+      if (m) { try { parsed = JSON.parse(m[0]); } catch(_) {} }
+    }
+    // Try 3: extract between first { and last }
+    if (!parsed) {
+      const start = rawText.indexOf('{');
+      const end = rawText.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        try { parsed = JSON.parse(rawText.slice(start, end+1)); } catch(_) {} 
+      }
+    }
+    if (!parsed) throw new Error('JSON parse failed. Raw response: ' + rawText.slice(0,300));
+
+    const prmt = parsed.prompt || '';
+    document.getElementById('ldots').classList.remove('on');
+    document.getElementById('oprmt').textContent = prmt;
+    document.getElementById('oprmt').style.display = 'block';
+    document.getElementById('ofoot').style.display = 'flex';
+    document.getElementById('copyBtn').style.display = 'inline-flex';
+    genBtn.disabled = false; regenBtn.disabled = false;
+    genBtn.style.opacity = '1'; genBtn.style.cursor = 'pointer';
+    updateCC(prmt);
+
+  } catch(err) {
+    document.getElementById('ldots').classList.remove('on');
+    document.getElementById('oprmt').textContent = 'Error: ' + err.message;
+    document.getElementById('oprmt').style.display = 'block';
+    document.getElementById('ofoot').style.display = 'flex';
+    genBtn.disabled = false; regenBtn.disabled = false;
+    genBtn.style.opacity = '1'; genBtn.style.cursor = 'pointer';
+  }
+}
+
+/* ═══════════ INIT ═══════════ */
+document.getElementById('int-space').addEventListener('change', populateFurniture);
+applyLang();
+</script>
+</body>
+</html>
